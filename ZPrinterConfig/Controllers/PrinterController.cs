@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,20 @@ namespace ZPrinterConfig.Controllers
 {
     public class PrinterController
     {
+        public class PrinterSetting : Core.BaseViewModel
+        {
+            public string Name { get; internal set; }
+            public string WriteValue { get => App.Settings.GetValue(Name, Default); set => App.Settings.SetValue(Name, value); }
+            public string ReadValue { get => _ReadValue; set => SetProperty(ref _ReadValue, value); }
+            private string _ReadValue;
+            public string Default { get; internal set; }
+
+            public string Recommended { get => _Recommended; set => SetProperty(ref _Recommended, value); }
+            private string _Recommended;
+
+            public string Options { get; internal set; }
+        }
+
         private AsyncSocket.ASocketManager Socket { get; }
 
         public SocketStates SocketState { get; set; }
@@ -60,7 +75,8 @@ namespace ZPrinterConfig.Controllers
         }
 
         public void Send(string message) => Socket.Send(message);
-        public string Recieve(int timeout) => System.Text.Encoding.UTF8.GetString(Socket.Receive(timeout));
+        public string Recieve(int timeout) => Socket.Receive(timeout);
+        public string Recieve(int timeout, string terminator) => Socket.Receive(timeout, terminator);
 
         private void Socket_ExceptionEvent(object sender, EventArgs e)
         {
@@ -82,6 +98,60 @@ namespace ZPrinterConfig.Controllers
             string message = (string)sender;
 
 
+        }
+
+        public List<PrinterSetting> GetAllSettings(string ip, string port)
+        {
+            List<PrinterSetting> settings = new List<PrinterSetting>();
+
+            if (Connect(ip, port))
+            {
+                Socket.Send($"! U1 getvar \"all\"\r\n");
+
+                foreach(var line in Socket.Receive(1000, "\"\"").Split('\n'))
+                {
+                    if(!line.TrimEnd('\r').EndsWith("."))
+                        settings.Add(new PrinterSetting() { Name = line.TrimEnd('\r') });
+                }
+                settings.Remove(settings.Last());
+
+                Socket.Send($"! U1 getvar \"allcv\"\r\n");
+
+                foreach (var ln in Socket.Receive(1000, "\"\"").Split('\n'))
+                {
+                    string line = ln.TrimEnd('\r');
+                    if (!line.EndsWith("."))
+                    {
+                        if (line.Contains("Choices:"))
+                        {
+                            int ind = line.IndexOf(' ');
+                            if(ind != -1)
+                            {
+                                string name = line.Substring(0, ind);
+                                try
+                                {
+                                    name = name.TrimEnd(',');
+                                    PrinterSetting setting = settings.First(x => x.Name == name); 
+                                    setting.Options = line.Substring(line.IndexOf("Choices:") + "Choices:".Length);
+                                }
+                                catch 
+                                {
+
+                                }
+
+
+                            
+                            }
+                        }
+
+                    }
+                        
+                }
+
+                Disconnect();
+            }
+
+            return settings;
         }
 
     }

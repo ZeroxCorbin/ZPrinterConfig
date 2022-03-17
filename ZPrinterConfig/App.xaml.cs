@@ -23,7 +23,7 @@ namespace ZPrinterConfig
 #if DEBUG
         public static string WorkingDir { get; set; } = System.IO.Directory.GetCurrentDirectory();
 #else        
-        public static string WorkingDir { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\TDD\\LVS_ImageTransfer\\";
+        public static string WorkingDir { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\TDD\\ZPrinterConfig\\";
 #endif
 
         public static string UserDataDirectory => $"{WorkingDir}\\UserData";

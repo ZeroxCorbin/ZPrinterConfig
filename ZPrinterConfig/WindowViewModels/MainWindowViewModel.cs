@@ -13,27 +13,12 @@ namespace ZPrinterConfig.WindowViewModele
 {
     public class MainWindowViewModel : Core.BaseViewModel
     {
+ 
+        
         private PrinterController Printer { get; } = new PrinterController();
 
         public string Host { get => App.Settings.GetValue("PrinterHost", ""); set => App.Settings.SetValue("PrinterHost", value); }
-        public string Port { get => App.Settings.GetValue("PrinterPort", ""); set => App.Settings.SetValue("PrinterPort", value); }
-
-        public class PrinterSetting : Core.BaseViewModel
-        {
-            public string Name { get; internal set; }
-            public string WriteValue { get => App.Settings.GetValue(Name, Default); set => App.Settings.SetValue(Name, value); }
-            public string ReadValue { get => _ReadValue; set => SetProperty(ref _ReadValue, value); }
-            private string _ReadValue;
-            public string Default { get; internal set; }
-            public string Options { get; internal set; }
-        }
-        public ObservableCollection<PrinterSetting> Settings { get; } = new ObservableCollection<PrinterSetting>()
-        {
-            new PrinterSetting() { Name = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
-            new PrinterSetting() { Name = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
-            new PrinterSetting() { Name = "ezpl.reprint_void_length", Default = "203", Options = "1-32000" },
-            new PrinterSetting() { Name = "ezpl.reprint_void_pattern", Default = "1", Options = "1-4" },
-        };
+        public string Port { get => App.Settings.GetValue("PrinterPort", "9100"); set => App.Settings.SetValue("PrinterPort", value); }
 
         public string Status
         {
@@ -42,19 +27,40 @@ namespace ZPrinterConfig.WindowViewModele
         }
         private string _Status;
 
-        public string ConnectButtonText { get => connectButtonText; set => SetProperty(ref connectButtonText, value); }
-        private string connectButtonText = "Connect";
-        public bool ConnectionState { get => connectionState; set => SetProperty(ref connectionState, value); }
-        private bool connectionState;
-        public string ConnectMessage { get => connectMessage; set { _ = SetProperty(ref connectMessage, value); } }
-        private string connectMessage;
-        public bool IsConnected
+        public ObservableCollection<PrinterController.PrinterSetting> BVSettings { get; } = new ObservableCollection<PrinterController.PrinterSetting>()
         {
-            get => isConnected;
-            set { SetProperty(ref isConnected, value); OnPropertyChanged("IsNotConnected"); }
+            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
+            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
+            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
+            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_void_pattern", Default = "1", Options = "1 - 4" },
+            new PrinterController.PrinterSetting() { Name = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
+            new PrinterController.PrinterSetting() { Name = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
+            new PrinterController.PrinterSetting() { Name = "zpl.label_top", Default = "0",  Options = "-120 - 120" },
+        };
+        public ObservableCollection<string> BVOperationTypes { get; } = new ObservableCollection<string>()
+        {
+            "Backup/Void Ribbon",
+            "Backup/Void Direct",
+            "Normal",
+        };
+        public string BVSelectedOperationType
+        {
+            get { string val = App.Settings.GetValue("BVSelectedOperationType", "Backup/Void Ribbon"); BVSelectedOperationType_Changed(val); return val; }
+            set { App.Settings.SetValue("BVSelectedOperationType", value); BVSelectedOperationType_Changed(value); }
         }
-        private bool isConnected = false;
-        public bool IsNotConnected { get => !isConnected; }
+
+        public ICommand BVRead { get; }
+        public ICommand BVReadAll { get; }
+        public ICommand BVWrite { get; }
+        public ICommand BVWriteAll { get; }
+
+        public ObservableCollection<PrinterController.PrinterSetting> Settings { get; } = new ObservableCollection<PrinterController.PrinterSetting>();
+
+        
+        public PrinterController.PrinterSetting NewSetting { get; } = new PrinterController.PrinterSetting();
+
+        public ICommand GetAllSettings { get; }
+        public ICommand AddSetting { get; }
 
         public ICommand Read { get; }
         public ICommand ReadAll { get; }
@@ -65,12 +71,22 @@ namespace ZPrinterConfig.WindowViewModele
         {
             Printer.SocketStateEvent += Printer_SocketStateEvent;
 
+            BVRead = new Core.RelayCommand(BVReadAction, c => true);
+            BVReadAll = new Core.RelayCommand(BVReadAllAction, c => true);
+
+            BVWrite = new Core.RelayCommand(BVWriteAction, c => true);
+            BVWriteAll = new Core.RelayCommand(BVWriteAllAction, c => true);
+
+            GetAllSettings = new Core.RelayCommand(GetAllSettingsAction, c => true);
+            AddSetting = new Core.RelayCommand(AddSettingAction, c => true);
+
             Read = new Core.RelayCommand(ReadAction, c => true);
             ReadAll = new Core.RelayCommand(ReadAllAction, c => true);
 
             Write = new Core.RelayCommand(WriteAction, c => true);
             WriteAll = new Core.RelayCommand(WriteAllAction, c => true);
         }
+
 
         public string GetIPAddress()
         {
@@ -97,21 +113,22 @@ namespace ZPrinterConfig.WindowViewModele
         }
         private void Printer_SocketStateEvent(SocketStates state, string message)
         {
-            ConnectMessage = message;
+            Status = message;
         }
 
-        private void ReadAction(object parameter)
+
+        private void BVReadAction(object parameter)
         {
             string ip = GetIPAddress();
-            if(ip == null)
+            if (ip == null)
             {
-                ConnectMessage = "Invalid Host Name or IP";
+                Status = "Invalid Host Name or IP";
                 return;
             }
 
             if (Printer.Connect(ip, Port))
             {
-                PrinterSetting ps = (PrinterSetting)parameter;
+                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
                 Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
                 string res = Printer.Recieve(1000);
@@ -121,22 +138,143 @@ namespace ZPrinterConfig.WindowViewModele
                 Printer.Disconnect();
             }
         }
-
-        private void ReadAllAction(object parameter)
+        private void BVReadAllAction(object parameter)
         {
             string ip = GetIPAddress();
             if (ip == null)
             {
-                ConnectMessage = "Invalid Host Name or IP";
+                Status = "Invalid Host Name or IP";
                 return;
             }
 
             if (Printer.Connect(ip, Port))
             {
-                foreach(PrinterSetting ps in Settings)
+                foreach (PrinterController.PrinterSetting ps in BVSettings)
                 {
                     Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
                     string res = Printer.Recieve(1000);
+
+                    ps.ReadValue = res.Trim('\"', '\0');
+                }
+
+                Printer.Disconnect();
+            }
+        }
+
+        private void BVWriteAction(object parameter)
+        {
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                Status = "Invalid Host Name or IP";
+                return;
+            }
+
+            if (Printer.Connect(ip, Port))
+            {
+                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+
+                Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\"\r\n");
+
+                ReadAction(parameter);
+            }
+        }
+        private void BVWriteAllAction(object parameter)
+        {
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                Status = "Invalid Host Name or IP";
+                return;
+            }
+
+            if (Printer.Connect(ip, Port))
+            {
+                foreach (PrinterController.PrinterSetting ps in BVSettings)
+                {
+                    Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\"\r\n");
+
+                    Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
+                    string res = Printer.Recieve(1000);
+
+                    ps.ReadValue = res.Trim('\"', '\0');
+                }
+
+                Printer.Disconnect();
+            }
+        }
+
+        private void BVSelectedOperationType_Changed(string value)
+        {
+            if(value == "Backup/Void Ribbon")
+            {
+                BVSettings.First(s => s.Name == "ezpl.reprint_mode").Recommended = "on";
+                BVSettings.First(s => s.Name == "ezpl.reprint_void").Recommended = "custom";
+                BVSettings.First(s => s.Name == "ezpl.reprint_void_length").Recommended = "< 203";
+                BVSettings.First(s => s.Name == "device.applicator.start_print_mode").Recommended = "pulse";
+                BVSettings.First(s => s.Name == "ezpl.tear_off").Recommended = "< 200";
+                BVSettings.First(s => s.Name == "zpl.label_top").Recommended = "0";
+            }
+            if (value == "Backup/Void Direct")
+            {
+                BVSettings.First(s => s.Name == "ezpl.reprint_mode").Recommended = "on";
+                BVSettings.First(s => s.Name == "ezpl.reprint_void").Recommended = "on";
+                BVSettings.First(s => s.Name == "ezpl.reprint_void_length").Recommended = "";
+                BVSettings.First(s => s.Name == "device.applicator.start_print_mode").Recommended = "pulse";
+                BVSettings.First(s => s.Name == "ezpl.tear_off").Recommended = "";
+                BVSettings.First(s => s.Name == "zpl.label_top").Recommended = "";
+            }
+            if (value == "Normal")
+            {
+                BVSettings.First(s => s.Name == "ezpl.reprint_mode").Recommended = "off";
+                BVSettings.First(s => s.Name == "ezpl.reprint_void").Recommended = "off";
+                BVSettings.First(s => s.Name == "ezpl.reprint_void_length").Recommended = "";
+                BVSettings.First(s => s.Name == "device.applicator.start_print_mode").Recommended = "level";
+                BVSettings.First(s => s.Name == "ezpl.tear_off").Recommended = "";
+                BVSettings.First(s => s.Name == "zpl.label_top").Recommended = "";
+            }
+        }
+
+
+        private void ReadAction(object parameter)
+        {
+            string ip = GetIPAddress();
+            if(ip == null)
+            {
+                Status = "Invalid Host Name or IP";
+                return;
+            }
+
+            if (Printer.Connect(ip, Port))
+            {
+                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+
+                Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
+                string res = Printer.Recieve(1000, "\"");
+
+                ps.ReadValue = res.Trim('\"', '\0');
+
+                Printer.Disconnect();
+            }
+        }
+        private void ReadAllAction(object parameter)
+        {
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                Status = "Invalid Host Name or IP";
+                return;
+            }
+
+            if (Printer.Connect(ip, Port))
+            {
+                foreach(PrinterController.PrinterSetting ps in Settings)
+                {
+                    if (ps.Name.StartsWith("file"))
+                        continue;
+
+                    Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
+                    string res = Printer.Recieve(1000, "\"");
 
                     ps.ReadValue = res.Trim('\"', '\0');
                 }
@@ -150,33 +288,35 @@ namespace ZPrinterConfig.WindowViewModele
             string ip = GetIPAddress();
             if (ip == null)
             {
-                ConnectMessage = "Invalid Host Name or IP";
+                Status = "Invalid Host Name or IP";
                 return;
             }
 
             if (Printer.Connect(ip, Port))
             {
-                PrinterSetting ps = (PrinterSetting)parameter;
+                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
                 Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\"\r\n");
 
                 ReadAction(parameter);
             }
         }
-
         private void WriteAllAction(object parameter)
         {
             string ip = GetIPAddress();
             if (ip == null)
             {
-                ConnectMessage = "Invalid Host Name or IP";
+                Status = "Invalid Host Name or IP";
                 return;
             }
 
             if (Printer.Connect(ip, Port))
             {
-                foreach (PrinterSetting ps in Settings)
+                foreach (PrinterController.PrinterSetting ps in Settings)
                 {
+                    if (string.IsNullOrEmpty(ps.WriteValue))
+                        continue;
+
                     Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\"\r\n");
 
                     Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
@@ -186,6 +326,30 @@ namespace ZPrinterConfig.WindowViewModele
                 }
 
                 Printer.Disconnect();
+            }
+        }
+
+
+        private void AddSettingAction(object parameter)
+        {
+
+        }
+        private void GetAllSettingsAction(object parameter)
+        {
+            Settings.Clear();
+
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                Status = "Invalid Host Name or IP";
+                return;
+            }
+
+            var settings = Printer.GetAllSettings(ip, Port);
+
+            foreach(var set in settings)
+            {
+                Settings.Add(set);
             }
         }
     }

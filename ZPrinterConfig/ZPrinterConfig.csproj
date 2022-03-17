@@ -101,6 +101,7 @@
     </Compile>
     <Compile Include="Controllers\PrinterController.cs" />
     <Compile Include="Controllers\SocketStatesEnum.cs" />
+    <Compile Include="Controllers\V275_NodeController.cs" />
     <Compile Include="Models\ZebraCommands.cs" />
     <Compile Include="WindowViewModels\MainWindowViewModel.cs" />
     <Compile Include="WindowViews\MainWindowView.xaml.cs">
@@ -145,6 +146,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Assets\Command List.txt" />
     <Content Include="Assets\RAW Command List.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
