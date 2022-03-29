@@ -12,7 +12,8 @@ namespace ZPrinterConfig.Controllers
         public class PrinterSetting : Core.BaseViewModel
         {
             public string Name { get; internal set; }
-            public string WriteValue { get => App.Settings.GetValue(Name, Default); set => App.Settings.SetValue(Name, value); }
+            public string WriteValue { get => App.Settings.GetValue(Name, Default);
+                set => App.Settings.SetValue(Name, value); }
             public string ReadValue { get => _ReadValue; set => SetProperty(ref _ReadValue, value); }
             private string _ReadValue;
             public string Default { get; internal set; }

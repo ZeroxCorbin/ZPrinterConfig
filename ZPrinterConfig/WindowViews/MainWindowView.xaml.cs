@@ -24,5 +24,15 @@ namespace ZPrinterConfig.WindowViews
         {
             InitializeComponent();
         }
+
+        private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            ((Controllers.PrinterController.PrinterSetting)e.EditingElement.DataContext).WriteValue = ((TextBox)e.EditingElement).Text;
+        }
+
+        private void DataGrid_CellEditEnding_1(object sender, DataGridCellEditEndingEventArgs e)
+        {
+((Controllers.PrinterController.PrinterSetting)e.EditingElement.DataContext).WriteValue = ((TextBox)e.EditingElement).Text;
+        }
     }
 }

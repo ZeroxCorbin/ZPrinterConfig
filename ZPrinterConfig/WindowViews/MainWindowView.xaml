@@ -43,7 +43,7 @@
                         <ComboBox ItemsSource="{Binding BVOperationTypes}" SelectedValue="{Binding BVSelectedOperationType}"/>
                     </StackPanel>
 
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" CellEditEnding="DataGrid_CellEditEnding">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneWay}"/>
 
@@ -53,7 +53,8 @@
                             <DataGridTextColumn Header="Recommended" Binding="{Binding Recommended, Mode=OneWay}">
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell">
-                                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                        <Setter Property="TextBlock.TextAlignment" Value="Right" />
+                                        <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
@@ -62,6 +63,7 @@
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell">
                                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                        <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
@@ -122,6 +124,7 @@
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell">
                                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                        <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
@@ -142,7 +145,7 @@
                         <Button Content="Get All" Command="{Binding GetAllSettings}"/>
                     </StackPanel>
 
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Settings}" AutoGenerateColumns="False" CanUserAddRows="False">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Settings}" AutoGenerateColumns="False" CanUserAddRows="False" CellEditEnding="DataGrid_CellEditEnding_1">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneWay}"/>
 
@@ -150,6 +153,7 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style>
                                         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                                        <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                         <!--<Setter Property="TextBlock.TextAlignment" Value="Center"/>-->
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
@@ -168,6 +172,7 @@
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell">
                                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                        <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
@@ -228,6 +233,7 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style>
                                         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                                        <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                         <!--<Setter Property="TextBlock.TextAlignment" Value="Center"/>-->
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
