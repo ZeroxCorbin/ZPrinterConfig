@@ -152,8 +152,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\Dropbox\Projects\Git_Managed\AsyncSocket\AsyncSocket.csproj">
-      <Project>{4f9f4b3f-f51e-4743-8236-9edf44014bd8}</Project>
+    <ProjectReference Include="..\..\AsyncSocket\AsyncSocket.csproj">
+      <Project>{1dabc235-4489-404e-8fc8-0d5f43dc6138}</Project>
       <Name>AsyncSocket</Name>
     </ProjectReference>
   </ItemGroup>

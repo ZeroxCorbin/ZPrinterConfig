@@ -84,12 +84,12 @@ namespace ZPrinterConfig.Controllers
             SocketState = SocketStates.Closed;
             SocketStateEvent?.Invoke(SocketStates.Exception, ((Exception)sender).Message);
         }
-        private void Socket_ConnectEvent(object sender, EventArgs e)
+        private void Socket_ConnectEvent()
         {
             SocketState = SocketStates.Open;
             SocketStateEvent?.Invoke(SocketStates.Open, "Open");
         }
-        private void Socket_CloseEvent(object sender, EventArgs e)
+        private void Socket_CloseEvent()
         {
             SocketState = SocketStates.Closed;
             SocketStateEvent?.Invoke(SocketStates.Closed, "Close");
