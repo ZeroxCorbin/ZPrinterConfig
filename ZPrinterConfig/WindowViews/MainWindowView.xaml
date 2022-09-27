@@ -48,7 +48,14 @@
                             <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneWay}"/>
 
                             <DataGridTextColumn Header="Options" Binding="{Binding Options, Mode=OneWay}"/>
-                            <DataGridTextColumn Header="Default" Binding="{Binding Default, Mode=OneWay}"/>
+                            <DataGridTextColumn Header="Default" Binding="{Binding Default, Mode=OneWay}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                        <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
 
                             <DataGridTextColumn Header="Recommended" Binding="{Binding Recommended, Mode=OneWay}">
                                 <DataGridTextColumn.CellStyle>
