@@ -46,6 +46,7 @@
                     <DataGrid Grid.Row="1" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" CellEditEnding="DataGrid_CellEditEnding">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneWay}"/>
+                            <DataGridTextColumn Header="Parameter Name" Binding="{Binding ParameterName, Mode=OneWay}"/>
 
                             <DataGridTextColumn Header="Options" Binding="{Binding Options, Mode=OneWay}"/>
                             <DataGridTextColumn Header="Default" Binding="{Binding Default, Mode=OneWay}">
@@ -154,7 +155,7 @@
 
                     <DataGrid Grid.Row="1" ItemsSource="{Binding Settings}" AutoGenerateColumns="False" CanUserAddRows="False" CellEditEnding="DataGrid_CellEditEnding_1">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneWay}"/>
+                            <DataGridTextColumn Header="Parameter Name" Binding="{Binding ParameterName, Mode=OneWay}"/>
 
                             <DataGridTextColumn Header="Options" Binding="{Binding Options, Mode=OneWay}" MaxWidth="200">
                                 <DataGridTextColumn.ElementStyle>

@@ -29,12 +29,14 @@ namespace ZPrinterConfig.WindowViewModele
 
         public ObservableCollection<PrinterController.PrinterSetting> BVSettings { get; } = new ObservableCollection<PrinterController.PrinterSetting>()
         {
-            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
-            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
-            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
-            new PrinterController.PrinterSetting() { Name = "ezpl.reprint_void_pattern", Default = "1", Options = "1 - 4" },
-            new PrinterController.PrinterSetting() { Name = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
-            new PrinterController.PrinterSetting() { Name = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
+            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
+            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
+            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
+            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1 - 4" },
+            new PrinterController.PrinterSetting() { ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
+            new PrinterController.PrinterSetting() { ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
+            new PrinterController.PrinterSetting() { ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
+            new PrinterController.PrinterSetting() { ParameterName = "device.applicator.end_print", Default = "1",  Options = "off, 1" },
         };
         public ObservableCollection<string> BVOperationTypes { get; } = new ObservableCollection<string>()
         {
@@ -42,6 +44,7 @@ namespace ZPrinterConfig.WindowViewModele
             "Backup/Void Direct",
             "Normal",
         };
+
         public string BVSelectedOperationType
         {
             get { string val = App.Settings.GetValue("BVSelectedOperationType", "Backup/Void Ribbon"); BVSelectedOperationType_Changed(val); return val; }
@@ -129,7 +132,7 @@ namespace ZPrinterConfig.WindowViewModele
             {
                 PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
-                Printer.Send($"! U1 getvar \"{ps.Name}\" \r\n");
+                Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
                 string res = Printer.Recieve(1000);
 
                 ps.ReadValue = res.Trim('\"', '\0');
@@ -150,7 +153,7 @@ namespace ZPrinterConfig.WindowViewModele
             {
                 foreach (PrinterController.PrinterSetting ps in BVSettings)
                 {
-                    Printer.Send($"! U1 getvar \"{ps.Name}\" \r\n");
+                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
                     string res = Printer.Recieve(1000);
 
                     ps.ReadValue = res.Trim('\"', '\0');
@@ -174,7 +177,7 @@ namespace ZPrinterConfig.WindowViewModele
                 PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
                 //Printer.Send($"! U1 getvar \"\" \"\"\r\n");
-                Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\"\r\n ");
+                Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n ");
 
                 ReadAction(parameter);
             }
@@ -192,9 +195,9 @@ namespace ZPrinterConfig.WindowViewModele
             {
                 foreach (PrinterController.PrinterSetting ps in BVSettings)
                 {
-                    Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\" \r\n");
+                    Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\" \r\n");
 
-                    Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
+                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
                     string res = Printer.Recieve(1000);
 
                     ps.ReadValue = res.Trim('\"', '\0');
@@ -208,27 +211,27 @@ namespace ZPrinterConfig.WindowViewModele
         {
             if(value == "Backup/Void Ribbon")
             {
-                BVSettings.First(s => s.Name == "ezpl.reprint_mode").Recommended = "on";
-                BVSettings.First(s => s.Name == "ezpl.reprint_void").Recommended = "custom";
-                BVSettings.First(s => s.Name == "ezpl.reprint_void_length").Recommended = "< 203";
-                BVSettings.First(s => s.Name == "device.applicator.start_print_mode").Recommended = "pulse";
-                BVSettings.First(s => s.Name == "ezpl.tear_off").Recommended = "< 200";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_mode").Recommended = "on";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_void").Recommended = "custom";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_void_length").Recommended = "< 203";
+                BVSettings.First(s => s.ParameterName == "device.applicator.start_print_mode").Recommended = "pulse";
+                BVSettings.First(s => s.ParameterName == "ezpl.tear_off").Recommended = "< 200";
             }
             if (value == "Backup/Void Direct")
             {
-                BVSettings.First(s => s.Name == "ezpl.reprint_mode").Recommended = "on";
-                BVSettings.First(s => s.Name == "ezpl.reprint_void").Recommended = "on";
-                BVSettings.First(s => s.Name == "ezpl.reprint_void_length").Recommended = "";
-                BVSettings.First(s => s.Name == "device.applicator.start_print_mode").Recommended = "pulse";
-                BVSettings.First(s => s.Name == "ezpl.tear_off").Recommended = "";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_mode").Recommended = "on";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_void").Recommended = "on";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_void_length").Recommended = "";
+                BVSettings.First(s => s.ParameterName == "device.applicator.start_print_mode").Recommended = "pulse";
+                BVSettings.First(s => s.ParameterName == "ezpl.tear_off").Recommended = "";
             }
             if (value == "Normal")
             {
-                BVSettings.First(s => s.Name == "ezpl.reprint_mode").Recommended = "off";
-                BVSettings.First(s => s.Name == "ezpl.reprint_void").Recommended = "off";
-                BVSettings.First(s => s.Name == "ezpl.reprint_void_length").Recommended = "";
-                BVSettings.First(s => s.Name == "device.applicator.start_print_mode").Recommended = "level";
-                BVSettings.First(s => s.Name == "ezpl.tear_off").Recommended = "";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_mode").Recommended = "off";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_void").Recommended = "off";
+                BVSettings.First(s => s.ParameterName == "ezpl.reprint_void_length").Recommended = "";
+                BVSettings.First(s => s.ParameterName == "device.applicator.start_print_mode").Recommended = "level";
+                BVSettings.First(s => s.ParameterName == "ezpl.tear_off").Recommended = "";
             }
         }
 
@@ -246,7 +249,7 @@ namespace ZPrinterConfig.WindowViewModele
             {
                 PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
-                Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
+                Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
                 string res = Printer.Recieve(1000, "\"");
 
                 ps.ReadValue = res.Trim('\"', '\0');
@@ -267,10 +270,10 @@ namespace ZPrinterConfig.WindowViewModele
             {
                 foreach(PrinterController.PrinterSetting ps in Settings)
                 {
-                    if (ps.Name.StartsWith("file"))
+                    if (ps.ParameterName.StartsWith("file"))
                         continue;
 
-                    Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
+                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
                     string res = Printer.Recieve(1000, "\"");
 
                     ps.ReadValue = res.Trim('\"', '\0');
@@ -293,7 +296,7 @@ namespace ZPrinterConfig.WindowViewModele
             {
                 PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
-                Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\"\r\n");
+                Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n");
 
                 ReadAction(parameter);
             }
@@ -314,9 +317,9 @@ namespace ZPrinterConfig.WindowViewModele
                     if (string.IsNullOrEmpty(ps.WriteValue))
                         continue;
 
-                    Printer.Send($"! U1 setvar \"{ps.Name}\" \"{ps.WriteValue}\"\r\n");
+                    Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n");
 
-                    Printer.Send($"! U1 getvar \"{ps.Name}\"\r\n");
+                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
                     string res = Printer.Recieve(1000);
 
                     ps.ReadValue = res.Trim('\"', '\0');

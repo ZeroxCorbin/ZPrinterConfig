@@ -12,8 +12,11 @@ namespace ZPrinterConfig.Controllers
         public class PrinterSetting : Core.BaseViewModel
         {
             public string Name { get; internal set; }
-            public string WriteValue { get => App.Settings.GetValue(Name, Default);
-                set => App.Settings.SetValue(Name, value); }
+
+            public string ParameterName { get; internal set; }
+
+            public string WriteValue { get => App.Settings.GetValue(ParameterName, Default);
+                set => App.Settings.SetValue(ParameterName, value); }
             public string ReadValue { get => _ReadValue; set => SetProperty(ref _ReadValue, value); }
             private string _ReadValue;
             public string Default { get; internal set; }
@@ -112,7 +115,7 @@ namespace ZPrinterConfig.Controllers
                 foreach(var line in Socket.Receive(1000, "\"\"").Split('\n'))
                 {
                     if(!line.TrimEnd('\r').EndsWith("."))
-                        settings.Add(new PrinterSetting() { Name = line.TrimEnd('\r') });
+                        settings.Add(new PrinterSetting() { ParameterName = line.TrimEnd('\r') });
                 }
                 settings.Remove(settings.Last());
 
@@ -132,7 +135,7 @@ namespace ZPrinterConfig.Controllers
                                 try
                                 {
                                     name = name.TrimEnd(',');
-                                    PrinterSetting setting = settings.First(x => x.Name == name); 
+                                    PrinterSetting setting = settings.First(x => x.ParameterName == name); 
                                     setting.Options = line.Substring(line.IndexOf("Choices:") + "Choices:".Length);
                                 }
                                 catch 
