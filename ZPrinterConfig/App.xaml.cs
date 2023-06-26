@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,14 +18,14 @@ namespace ZPrinterConfig
     /// </summary>
     public partial class App : Application
     {
-
+        public static string Version;
         public static Databases.SimpleDatabase Settings { get; private set; }
 
-#if DEBUG
+//#if DEBUG
         public static string WorkingDir { get; set; } = System.IO.Directory.GetCurrentDirectory();
-#else        
-        public static string WorkingDir { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\TDD\\ZPrinterConfig\\";
-#endif
+//#else        
+//        public static string WorkingDir { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\TDD\\ZPrinterConfig\\";
+//#endif
 
         public static string UserDataDirectory => $"{WorkingDir}\\UserData";
         public static string MapDatabaseSettingsFile => "ApplicationSettings";
@@ -33,6 +34,8 @@ namespace ZPrinterConfig
         public App()
         {
             //new GetCommandData();
+
+            Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             if (!Directory.Exists(UserDataDirectory))
             {
@@ -52,7 +55,7 @@ namespace ZPrinterConfig
             base.OnStartup(e);
 
             // Set the application theme to Dark.Green
-            _ = ThemeManager.Current.ChangeTheme(this, Settings.GetValue("App.Theme", "Dark.Steel"));
+            _ = ThemeManager.Current.ChangeTheme(this, Settings.GetValue("App.Theme", "Light.Steel"));
 
             ThemeManager.Current.ThemeChanged += Current_ThemeChanged;
             ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;

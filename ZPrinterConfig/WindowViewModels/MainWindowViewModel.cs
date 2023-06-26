@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MahApps.Metro.Controls.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -13,8 +14,9 @@ namespace ZPrinterConfig.WindowViewModele
 {
     public class MainWindowViewModel : Core.BaseViewModel
     {
- 
-        
+
+        public string Version => App.Version;
+
         private PrinterController Printer { get; } = new PrinterController();
 
         public string Host { get => App.Settings.GetValue("PrinterHost", ""); set => App.Settings.SetValue("PrinterHost", value); }
@@ -29,14 +31,14 @@ namespace ZPrinterConfig.WindowViewModele
 
         public ObservableCollection<PrinterController.PrinterSetting> BVSettings { get; } = new ObservableCollection<PrinterController.PrinterSetting>()
         {
-            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
-            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
-            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
-            new PrinterController.PrinterSetting() { ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1 - 4" },
-            new PrinterController.PrinterSetting() { ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
-            new PrinterController.PrinterSetting() { ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
-            new PrinterController.PrinterSetting() { ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
-            new PrinterController.PrinterSetting() { ParameterName = "device.applicator.end_print", Default = "1",  Options = "off, 1" },
+            new PrinterController.PrinterSetting() { Name= "Reprint Mode", ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
+            new PrinterController.PrinterSetting() { Name= "Reprint Void", ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
+            new PrinterController.PrinterSetting() { Name= "Reprint Void Length", ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
+            new PrinterController.PrinterSetting() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1 - 4" },
+            new PrinterController.PrinterSetting() { Name= "Start Print Signal", ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
+            new PrinterController.PrinterSetting() { Name= "Tear Off", ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
+            new PrinterController.PrinterSetting() { Name= "Print Mode", ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
+            new PrinterController.PrinterSetting() { Name= "Applicator", ParameterName = "device.applicator.end_print", Default = "1",  Options = "off, 1" },
         };
         public ObservableCollection<string> BVOperationTypes { get; } = new ObservableCollection<string>()
         {
@@ -163,7 +165,7 @@ namespace ZPrinterConfig.WindowViewModele
             }
         }
 
-        private void BVWriteAction(object parameter)
+        private async void BVWriteAction(object parameter)
         {
             string ip = GetIPAddress();
             if (ip == null)
@@ -171,6 +173,9 @@ namespace ZPrinterConfig.WindowViewModele
                 Status = "Invalid Host Name or IP";
                 return;
             }
+
+            if (await DialogCoordinator.Instance.ShowMessageAsync(this, "Overwrite Parameter?", "Are you sure you want to overwrite the parameter?", MessageDialogStyle.AffirmativeAndNegative) != MessageDialogResult.Affirmative)
+                return;
 
             if (Printer.Connect(ip, Port))
             {
@@ -216,6 +221,8 @@ namespace ZPrinterConfig.WindowViewModele
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_void_length").Recommended = "< 203";
                 BVSettings.First(s => s.ParameterName == "device.applicator.start_print_mode").Recommended = "pulse";
                 BVSettings.First(s => s.ParameterName == "ezpl.tear_off").Recommended = "< 200";
+                BVSettings.First(s => s.ParameterName == "media.printmode").Recommended = "tear off";
+                BVSettings.First(s => s.ParameterName == "device.applicator.end_print").Recommended = "1";
             }
             if (value == "Backup/Void Direct")
             {
@@ -224,6 +231,8 @@ namespace ZPrinterConfig.WindowViewModele
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_void_length").Recommended = "";
                 BVSettings.First(s => s.ParameterName == "device.applicator.start_print_mode").Recommended = "pulse";
                 BVSettings.First(s => s.ParameterName == "ezpl.tear_off").Recommended = "";
+                BVSettings.First(s => s.ParameterName == "media.printmode").Recommended = "tear off";
+                BVSettings.First(s => s.ParameterName == "device.applicator.end_print").Recommended = "1";
             }
             if (value == "Normal")
             {
@@ -232,6 +241,8 @@ namespace ZPrinterConfig.WindowViewModele
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_void_length").Recommended = "";
                 BVSettings.First(s => s.ParameterName == "device.applicator.start_print_mode").Recommended = "level";
                 BVSettings.First(s => s.ParameterName == "ezpl.tear_off").Recommended = "";
+                BVSettings.First(s => s.ParameterName == "media.printmode").Recommended = "tear off";
+                BVSettings.First(s => s.ParameterName == "device.applicator.end_print").Recommended = "1";
             }
         }
 
@@ -283,7 +294,7 @@ namespace ZPrinterConfig.WindowViewModele
             }
         }
 
-        private void WriteAction(object parameter)
+        private async void WriteAction(object parameter)
         {
             string ip = GetIPAddress();
             if (ip == null)
@@ -291,6 +302,10 @@ namespace ZPrinterConfig.WindowViewModele
                 Status = "Invalid Host Name or IP";
                 return;
             }
+
+            if(await DialogCoordinator.Instance.ShowMessageAsync(this, "Overwrite Parameter?", "Are you sure you want to overwrite the parameter?", MessageDialogStyle.AffirmativeAndNegative) != MessageDialogResult.Affirmative)
+                return;
+
 
             if (Printer.Connect(ip, Port))
             {

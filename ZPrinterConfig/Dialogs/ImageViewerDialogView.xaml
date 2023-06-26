@@ -1,0 +1,26 @@
+﻿<Dialog:CustomDialog x:Class="ZPrinterConfig.Dialogs.ImageViewerDialogView"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                    xmlns:local="clr-namespace:ZPrinterConfig.Dialogs"
+                    xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                    xmlns:ViewModelsDiag="clr-namespace:ZPrinterConfig.Dialogs"
+                    xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+                    Dialog:DialogParticipation.Register="{Binding}"
+                    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                    d:DataContext="{d:DesignInstance Type=ViewModelsDiag:ImageViewerDialogViewModel}"
+                    mc:Ignorable="d" 
+                    d:DesignHeight="800" d:DesignWidth="800"
+                    PreviewKeyDown="CustomDialog_PreviewKeyDown"
+                    Style="{StaticResource {x:Type Dialog:BaseMetroDialog}}">
+    
+    <Dialog:CustomDialog.DialogTop>
+        <Grid>
+
+        </Grid>
+
+    </Dialog:CustomDialog.DialogTop>
+
+
+</Dialog:CustomDialog>

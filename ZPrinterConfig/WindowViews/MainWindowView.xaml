@@ -10,10 +10,40 @@
         Dialog:DialogParticipation.Register="{Binding}"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="Z-Printer Config" Height="auto" Width="auto">
+        SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen">
     <mah:MetroWindow.DataContext>
         <local:MainWindowViewModel/>
     </mah:MetroWindow.DataContext>
+
+    <mah:MetroWindow.Title>
+        <MultiBinding StringFormat="Z-Printer Config : {0}">
+            <Binding Path="Version"/>
+        </MultiBinding>
+    </mah:MetroWindow.Title>
+    
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>>
+
+            <!--<Button BorderThickness="0" 
+                        x:Name="btnColorBlind"
+                        Click="btnColorBlind_Click">
+                <IconPacks:PackIconModern Width="20" Height="20" Kind="Eye"/>
+            </Button>-->
+
+            <Button BorderThickness="0" 
+                        x:Name="btnLightTheme"
+                        Click="btnLightTheme_Click">
+                <IconPacks:PackIconModern Width="20" Height="20" Kind="WeatherSun"/>
+            </Button>
+
+            <Button BorderThickness="0" 
+                        x:Name="btnDarkTheme"
+                        Click="btnDarkTheme_Click">
+                <IconPacks:PackIconModern Width="20" Height="20" Kind="MoonWaningCrescent"/>
+            </Button>
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
+    
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
@@ -66,7 +96,15 @@
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
-
+                            
+                            <DataGridTemplateColumn Header=" ">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Label/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            
                             <DataGridTextColumn Header="Write Value" Binding="{Binding WriteValue}">
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell">
@@ -98,15 +136,9 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn Header=" ">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Label/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn>
+
+                            <!--<DataGridTemplateColumn>
                                 <DataGridTemplateColumn.Header>
                                     <Button Content="Read All" Command="{Binding Path=DataContext.BVReadAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
                                 </DataGridTemplateColumn.Header>
@@ -126,15 +158,23 @@
                                         </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                            </DataGridTemplateColumn>-->
 
-                            <DataGridTextColumn Header="Read Value" Binding="{Binding ReadValue}">
+                            <DataGridTextColumn Binding="{Binding ReadValue}">
+                                <DataGridTextColumn.Header>
+                                    <StackPanel>
+                                        <Button Content="Read All" Command="{Binding Path=DataContext.BVReadAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
+                                        <Label Content="Current Value"/>
+                                    </StackPanel>
+                                    
+                                </DataGridTextColumn.Header>
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell">
                                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
                                         <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
+            
                             </DataGridTextColumn>
 
                         </DataGrid.Columns>
@@ -142,7 +182,7 @@
                 </Grid>
             </Border>
 
-            <Border Grid.Row="2" Padding="10" Margin="5" BorderThickness="2" CornerRadius="3" BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
+            <Border Visibility="Collapsed" Grid.Row="2" Padding="10" Margin="5" BorderThickness="2" CornerRadius="3" BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -186,9 +226,9 @@
                             </DataGridTextColumn>
 
                             <DataGridTemplateColumn>
-                                <DataGridTemplateColumn.Header>
+                                <!--<DataGridTemplateColumn.Header>
                                     <Button Content="Write All" Command="{Binding Path=DataContext.WriteAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
-                                </DataGridTemplateColumn.Header>
+                                </DataGridTemplateColumn.Header>-->
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid>

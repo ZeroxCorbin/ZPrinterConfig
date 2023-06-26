@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using ControlzEx.Theming;
+using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,5 +35,9 @@ namespace ZPrinterConfig.WindowViews
         {
 ((Controllers.PrinterController.PrinterSetting)e.EditingElement.DataContext).WriteValue = ((TextBox)e.EditingElement).Text;
         }
+
+        private void btnLightTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Light.Steel");
+
+        private void btnDarkTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Dark.Steel");
     }
 }
