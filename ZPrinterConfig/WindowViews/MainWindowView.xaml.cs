@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ZPrinterConfig.WindowViewModele;
 
 namespace ZPrinterConfig.WindowViews
 {
@@ -39,5 +40,6 @@ namespace ZPrinterConfig.WindowViews
         private void btnLightTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Light.Steel");
 
         private void btnDarkTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Dark.Steel");
+
     }
 }
