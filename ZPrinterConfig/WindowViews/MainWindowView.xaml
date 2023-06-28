@@ -7,6 +7,7 @@
         xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:local="clr-namespace:ZPrinterConfig.WindowViewModele"
         xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+        xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
         Dialog:DialogParticipation.Register="{Binding}"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
@@ -16,7 +17,7 @@
     </mah:MetroWindow.DataContext>
 
     <mah:MetroWindow.Title>
-        <MultiBinding StringFormat="Z-Printer Config : {0}">
+        <MultiBinding StringFormat="ZPrinterConfig : {0}">
             <Binding Path="Version"/>
         </MultiBinding>
     </mah:MetroWindow.Title>
@@ -57,7 +58,7 @@
                 <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
                     <Label Content="Printer Connection Details" Margin="3"/>
                     <TextBox mah:TextBoxHelper.Watermark="Printer IP / Host" Margin="3"
-                         Text="{Binding Host}" MinWidth="80" />
+                         Text="{Binding Host}" MinWidth="80"/>
                     <TextBox mah:TextBoxHelper.Watermark="Port" Margin="3"
                          Text="{Binding Port}" MinWidth="80"/>
 

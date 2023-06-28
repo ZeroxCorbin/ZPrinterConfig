@@ -41,5 +41,9 @@ namespace ZPrinterConfig.WindowViews
 
         private void btnDarkTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Dark.Steel");
 
+        private void btnResetPortNumber_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

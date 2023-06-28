@@ -1,4 +1,5 @@
 ﻿using ControlzEx.Theming;
+using Squirrel;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -37,6 +38,11 @@ namespace ZPrinterConfig
 
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
+            SquirrelAwareApp.HandleEvents(
+                onInitialInstall: OnAppInstall,
+                onAppUninstall: OnAppUninstall,
+                onEveryRun: OnAppRun);
+
             if (!Directory.Exists(UserDataDirectory))
             {
                 _ = Directory.CreateDirectory(UserDataDirectory);
@@ -68,6 +74,40 @@ namespace ZPrinterConfig
 
             Settings.Dispose();
         }
+
+        private static void OnAppInstall(SemanticVersion version, IAppTools tools)
+        {
+            tools.CreateShortcutForThisExe(ShortcutLocation.StartMenu | ShortcutLocation.Desktop);
+        }
+
+        private static void OnAppUninstall(SemanticVersion version, IAppTools tools)
+        {
+            tools.RemoveShortcutForThisExe(ShortcutLocation.StartMenu | ShortcutLocation.Desktop);
+        }
+
+        private static void OnAppRun(SemanticVersion version, IAppTools tools, bool firstRun)
+        {
+            tools.SetProcessAppUserModelId();
+            // show a welcome message when the app is first installed
+            //if (firstRun)
+            //    MessageBox.Show("Thanks for installing my application!");
+        }
+
+        private static async Task UpdateMyApp()
+        {
+            using (var mgr = new UpdateManager("https://the.place/you-host/updates"))
+            {
+                    var newVersion = await mgr.UpdateApp();
+
+                // optionally restart the app automatically, or ask the user if/when they want to restart
+                if (newVersion != null)
+                {
+                    UpdateManager.RestartApp();
+                }
+            }
+
+        }
+
 
         public class GetCommandData
         {
