@@ -20,7 +20,7 @@ namespace ZPrinterConfig.WindowViewModele
         private PrinterController Printer { get; } = new PrinterController();
 
         public string Host { get => App.Settings.GetValue("PrinterHost", ""); set => App.Settings.SetValue("PrinterHost", value); }
-        public string Port { get => App.Settings.GetValue("PrinterPort", "9100"); set {  App.Settings.SetValue("PrinterPort", value); OnPropertyChanged("Port"); }  }
+        public string Port { get => App.Settings.GetValue("PrinterPort", "9100"); set { App.Settings.SetValue("PrinterPort", value); OnPropertyChanged("Port"); } }
 
         public string Status
         {
@@ -29,12 +29,20 @@ namespace ZPrinterConfig.WindowViewModele
         }
         private string _Status;
 
+
+        public string SocketStatus
+        {
+            get { return _SocketStatus; }
+            set { SetProperty(ref _SocketStatus, value); }
+        }
+        private string _SocketStatus;
+
         public ObservableCollection<PrinterController.PrinterSetting> BVSettings { get; } = new ObservableCollection<PrinterController.PrinterSetting>()
         {
             new PrinterController.PrinterSetting() { Name= "Reprint Mode", ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
             new PrinterController.PrinterSetting() { Name= "Reprint Void", ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
             new PrinterController.PrinterSetting() { Name= "Reprint Void Length", ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
-            new PrinterController.PrinterSetting() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1, 2, 3, 4" },
+            new PrinterController.PrinterSetting() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1, 2, 3, 4" , Recommended = ""},
             new PrinterController.PrinterSetting() { Name= "Start Print Signal", ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
             new PrinterController.PrinterSetting() { Name= "Tear Off", ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
             new PrinterController.PrinterSetting() { Name= "Print Mode", ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
@@ -55,16 +63,12 @@ namespace ZPrinterConfig.WindowViewModele
 
         public ICommand BVRead { get; }
         public ICommand BVReadAll { get; }
+        public ICommand BVCopyRecommended { get; }
         public ICommand BVWrite { get; }
-        public ICommand BVWriteAll { get; }
 
         public ObservableCollection<PrinterController.PrinterSetting> Settings { get; } = new ObservableCollection<PrinterController.PrinterSetting>();
 
-        
-        public PrinterController.PrinterSetting NewSetting { get; } = new PrinterController.PrinterSetting();
-
         public ICommand GetAllSettings { get; }
-        public ICommand AddSetting { get; }
 
         public ICommand Read { get; }
         public ICommand ReadAll { get; }
@@ -79,16 +83,15 @@ namespace ZPrinterConfig.WindowViewModele
             BVReadAll = new Core.RelayCommand(BVReadAllAction, c => true);
 
             BVWrite = new Core.RelayCommand(BVWriteAction, c => true);
-            BVWriteAll = new Core.RelayCommand(BVWriteAllAction, c => true);
+            BVCopyRecommended = new Core.RelayCommand(BVCopyRecommendedAction, c => true);
 
             GetAllSettings = new Core.RelayCommand(GetAllSettingsAction, c => true);
-            AddSetting = new Core.RelayCommand(AddSettingAction, c => true);
 
             Read = new Core.RelayCommand(ReadAction, c => true);
             ReadAll = new Core.RelayCommand(ReadAllAction, c => true);
 
             Write = new Core.RelayCommand(WriteAction, c => true);
-            WriteAll = new Core.RelayCommand(WriteAllAction, c => true);
+            //WriteAll = new Core.RelayCommand(WriteAllAction, c => true);
         }
 
 
@@ -117,104 +120,18 @@ namespace ZPrinterConfig.WindowViewModele
         }
         private void Printer_SocketStateEvent(SocketStates state, string message)
         {
-            Status = message;
+            SocketStatus = message;
         }
 
-
-        private void BVReadAction(object parameter)
+        private void ResetStatus()
         {
-            string ip = GetIPAddress();
-            if (ip == null)
-            {
-                Status = "Invalid Host Name or IP";
-                return;
-            }
-
-            if (Printer.Connect(ip, Port))
-            {
-                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
-
-                Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
-                string res = Printer.Recieve(1000);
-
-                ps.ReadValue = res.Trim('\"', '\0');
-
-                Printer.Disconnect();
-            }
-        }
-        private void BVReadAllAction(object parameter)
-        {
-            string ip = GetIPAddress();
-            if (ip == null)
-            {
-                Status = "Invalid Host Name or IP";
-                return;
-            }
-
-            if (Printer.Connect(ip, Port))
-            {
-                foreach (PrinterController.PrinterSetting ps in BVSettings)
-                {
-                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
-                    string res = Printer.Recieve(1000);
-
-                    ps.ReadValue = res.Trim('\"', '\0');
-                }
-
-                Printer.Disconnect();
-            }
-        }
-
-        private async void BVWriteAction(object parameter)
-        {
-            string ip = GetIPAddress();
-            if (ip == null)
-            {
-                Status = "Invalid Host Name or IP";
-                return;
-            }
-
-            if (await DialogCoordinator.Instance.ShowMessageAsync(this, "Overwrite Parameter?", "Are you sure you want to overwrite the parameter?", MessageDialogStyle.AffirmativeAndNegative) != MessageDialogResult.Affirmative)
-                return;
-
-            if (Printer.Connect(ip, Port))
-            {
-                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
-
-                //Printer.Send($"! U1 getvar \"\" \"\"\r\n");
-                Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n ");
-
-                ReadAction(parameter);
-            }
-        }
-        private void BVWriteAllAction(object parameter)
-        {
-            string ip = GetIPAddress();
-            if (ip == null)
-            {
-                Status = "Invalid Host Name or IP";
-                return;
-            }
-
-            if (Printer.Connect(ip, Port))
-            {
-                foreach (PrinterController.PrinterSetting ps in BVSettings)
-                {
-                    Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\" \r\n");
-
-                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
-                    string res = Printer.Recieve(1000);
-
-                    ps.ReadValue = res.Trim('\"', '\0');
-                }
-
-                Printer.Disconnect();
-            }
+            Status = "";
+            SocketStatus = "";
         }
 
         private void BVSelectedOperationType_Changed(string value)
         {
-            if(value == "Backup/Void Ribbon")
+            if (value == "Backup/Void Ribbon")
             {
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_mode").Recommended = "on";
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_void").Recommended = "custom";
@@ -246,18 +163,155 @@ namespace ZPrinterConfig.WindowViewModele
             }
         }
 
+        private void BVReadAction(object parameter)
+        {
+            Task.Run(ResetStatus);
 
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                SocketStatus = "Invalid Host Name or IP";
+                return;
+            }
+
+            _ = Task.Run(() =>
+            {
+                Status = "Writing parameter.";
+
+                if (Printer.Connect(ip, Port))
+                {
+                    PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+
+                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
+                    string res = Printer.Recieve(1000);
+
+                    ps.ReadValue = res.Trim('\"', '\0');
+
+                    Printer.Disconnect();
+                }
+
+                Task.Run(ResetStatus);
+            });
+        }
+        private void BVReadAllAction(object parameter)
+        {
+            Task.Run(ResetStatus);
+
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                SocketStatus = "Invalid Host Name or IP";
+                return;
+            }
+
+            _ = Task.Run(() =>
+            {
+                Status = "Writing parameter.";
+
+                if (Printer.Connect(ip, Port))
+                {
+                    foreach (PrinterController.PrinterSetting ps in BVSettings)
+                    {
+                        Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
+                        string res = Printer.Recieve(1000);
+
+                        ps.ReadValue = res.Trim('\"', '\0');
+                    }
+
+                    Printer.Disconnect();
+                }
+
+                Task.Run(ResetStatus);
+            });
+        }
+        private void BVCopyRecommendedAction(object parameter)
+        {
+            PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+
+            if (string.IsNullOrEmpty(ps.Recommended))
+                return;
+
+            ps.WriteValue = ps.Recommended;
+        }
+        private async void BVWriteAction(object parameter)
+        {
+            _ = Task.Run(ResetStatus);
+
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                SocketStatus = "Invalid Host Name or IP";
+                return;
+            }
+
+            if (await DialogCoordinator.Instance.ShowMessageAsync(this, "Overwrite Parameter?", "Are you sure you want to overwrite the parameter?", MessageDialogStyle.AffirmativeAndNegative) != MessageDialogResult.Affirmative)
+                return;
+
+            _ = Task.Run(() =>
+            {
+                Status = "Writing parameter.";
+
+                if (Printer.Connect(ip, Port))
+                {
+                    PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+
+                    //Printer.Send($"! U1 getvar \"\" \"\"\r\n");
+                    Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n ");
+
+                    ReadAction(parameter);
+                }
+
+                Task.Run(ResetStatus);
+            });
+
+        }
+
+        private void GetAllSettingsAction(object parameter)
+        {
+            Task.Run(ResetStatus);
+
+            Settings.Clear();
+
+            string ip = GetIPAddress();
+            if (ip == null)
+            {
+                SocketStatus = "Invalid Host Name or IP";
+                return;
+            }
+
+            Task.Run(() =>
+            {
+                Status = "Getting all available parameters. This can take awhile!";
+
+                var settings = Printer.GetAllSettings(ip, Port);
+
+                App.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    foreach (var set in settings)
+                    {
+                        Settings.Add(set);
+                    }
+                }));
+
+                Task.Run(ResetStatus);
+            });
+
+        }
         private void ReadAction(object parameter)
         {
+            Task.Run(ResetStatus);
+
             string ip = GetIPAddress();
-            if(ip == null)
+            if (ip == null)
             {
-                Status = "Invalid Host Name or IP";
+                SocketStatus = "Invalid Host Name or IP";
                 return;
             }
 
             if (Printer.Connect(ip, Port))
             {
+                Status = "Reading parameter.";
+
                 PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
                 Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
@@ -266,36 +320,50 @@ namespace ZPrinterConfig.WindowViewModele
                 ps.ReadValue = res.Trim('\"', '\0');
 
                 Printer.Disconnect();
+
+                Task.Run(ResetStatus);
             }
         }
         private void ReadAllAction(object parameter)
         {
+            Task.Run(ResetStatus);
+
             string ip = GetIPAddress();
             if (ip == null)
             {
-                Status = "Invalid Host Name or IP";
+                SocketStatus = "Invalid Host Name or IP";
                 return;
             }
 
-            if (Printer.Connect(ip, Port))
+            Task.Run(() =>
             {
-                foreach(PrinterController.PrinterSetting ps in Settings)
+                Status = "Reading all parameters. This can take awhile!";
+
+                if (Printer.Connect(ip, Port))
                 {
-                    if (ps.ParameterName.StartsWith("file"))
-                        continue;
+                    foreach (PrinterController.PrinterSetting ps in Settings)
+                    {
+                        if (ps.ParameterName.StartsWith("file"))
+                            continue;
 
-                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
-                    string res = Printer.Recieve(1000, "\"");
+                        Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
+                        string res = Printer.Recieve(1000, "\"");
 
-                    ps.ReadValue = res.Trim('\"', '\0');
+                        ps.ReadValue = res.Trim('\"', '\0');
+                    }
+
+                    Printer.Disconnect();
                 }
 
-                Printer.Disconnect();
-            }
-        }
+                Task.Run(ResetStatus);
+            });
 
+
+        }
         private async void WriteAction(object parameter)
         {
+            _ = Task.Run(ResetStatus);
+
             PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
 
             if (string.IsNullOrEmpty(ps.WriteValue))
@@ -304,73 +372,85 @@ namespace ZPrinterConfig.WindowViewModele
             string ip = GetIPAddress();
             if (ip == null)
             {
-                Status = "Invalid Host Name or IP";
+                SocketStatus = "Invalid Host Name or IP";
                 return;
             }
 
-            if(await DialogCoordinator.Instance.ShowMessageAsync(this, "Overwrite Parameter?", "Are you sure you want to overwrite the parameter?", MessageDialogStyle.AffirmativeAndNegative) != MessageDialogResult.Affirmative)
+            if (await DialogCoordinator.Instance.ShowMessageAsync(this, "Overwrite Parameter?", "Are you sure you want to overwrite the parameter?", MessageDialogStyle.AffirmativeAndNegative) != MessageDialogResult.Affirmative)
                 return;
 
-
-            if (Printer.Connect(ip, Port))
+            _ = Task.Run(() =>
             {
-                
+                Status = "Reading parameter.";
 
-                Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n");
-
-                ReadAction(parameter);
-            }
-        }
-        private void WriteAllAction(object parameter)
-        {
-            string ip = GetIPAddress();
-            if (ip == null)
-            {
-                Status = "Invalid Host Name or IP";
-                return;
-            }
-
-            if (Printer.Connect(ip, Port))
-            {
-                foreach (PrinterController.PrinterSetting ps in Settings)
+                if (Printer.Connect(ip, Port))
                 {
-                    if (string.IsNullOrEmpty(ps.WriteValue))
-                        continue;
-
                     Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n");
 
-                    Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
-                    string res = Printer.Recieve(1000);
-
-                    ps.ReadValue = res.Trim('\"', '\0');
+                    ReadAction(parameter);
                 }
 
-                Printer.Disconnect();
-            }
-        }
-
-
-        private void AddSettingAction(object parameter)
-        {
+                Task.Run(ResetStatus);
+            });
 
         }
-        private void GetAllSettingsAction(object parameter)
-        {
-            Settings.Clear();
 
-            string ip = GetIPAddress();
-            if (ip == null)
-            {
-                Status = "Invalid Host Name or IP";
-                return;
-            }
 
-            var settings = Printer.GetAllSettings(ip, Port);
+        //private void BVWriteAllAction(object parameter)
+        //{
+        //    Task.Run(ResetStatus);
 
-            foreach(var set in settings)
-            {
-                Settings.Add(set);
-            }
-        }
+        //    string ip = GetIPAddress();
+        //    if (ip == null)
+        //    {
+        //        SocketStatus = "Invalid Host Name or IP";
+        //        return;
+        //    }
+
+        //    if (Printer.Connect(ip, Port))
+        //    {
+        //        foreach (PrinterController.PrinterSetting ps in BVSettings)
+        //        {
+        //            Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\" \r\n");
+
+        //            Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
+        //            string res = Printer.Recieve(1000);
+
+        //            ps.ReadValue = res.Trim('\"', '\0');
+        //        }
+
+        //        Printer.Disconnect();
+        //    }
+        //}
+
+        //private void WriteAllAction(object parameter)
+        //{
+        //    Task.Run(ResetStatus);
+
+        //    string ip = GetIPAddress();
+        //    if (ip == null)
+        //    {
+        //        SocketStatus = "Invalid Host Name or IP";
+        //        return;
+        //    }
+
+        //    if (Printer.Connect(ip, Port))
+        //    {
+        //        foreach (PrinterController.PrinterSetting ps in Settings)
+        //        {
+        //            if (string.IsNullOrEmpty(ps.WriteValue))
+        //                continue;
+
+        //            Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n");
+
+        //            Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
+        //            string res = Printer.Recieve(1000);
+
+        //            ps.ReadValue = res.Trim('\"', '\0');
+        //        }
+
+        //        Printer.Disconnect();
+        //    }
+        //}
     }
 }

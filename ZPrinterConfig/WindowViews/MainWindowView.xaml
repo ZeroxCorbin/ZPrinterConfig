@@ -20,6 +20,7 @@
 
     <mah:MetroWindow.Resources>
         <Convert:BindingProxy x:Key="bindingProxy" Data="{Binding}"/>
+        <Convert:RecommendedValueToVisibility x:Key="recommendedValueToVisibility"/>
     </mah:MetroWindow.Resources>
 
     <mah:MetroWindow.Title>
@@ -58,14 +59,18 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
             <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
+                
                 <Label Content="Printer Connection Details" Margin="3"/>
+                
                 <TextBox mah:TextBoxHelper.Watermark="Printer IP / Host" Margin="3"
                          Text="{Binding Host}" MinWidth="80"/>
-                <TextBox mah:TextBoxHelper.Watermark="Port" Margin="3"
+                
+                <TextBox mah:TextBoxHelper.Watermark="Port" Margin="3,3,0,3"
                          Text="{Binding Port}" MinWidth="80"/>
 
                 <Button Grid.Column="1" Margin="0,3" Name="btnResetPortNumber"
@@ -73,7 +78,7 @@
                     <IconPacks:PackIconRadixIcons Kind="Reset"/>
                 </Button>
 
-                <Label Content="{Binding Status}"/>
+                <Label Content="{Binding SocketStatus}" Margin="3"/>
 
             </StackPanel>
         </Border>
@@ -87,8 +92,8 @@
 
         <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
 
-            <DataGrid x:Name="dgBVParameters" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" 
-                          CellEditEnding="DataGrid_CellEditEnding" Margin="3" SelectionChanged="DataGrid_SelectionChanged">
+            <DataGrid x:Name="dgBVParameters" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False"
+                          Margin="3" SelectionChanged="DataGrid_SelectionChanged">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Parameter Name"  Binding="{Binding Name, Mode=OneWay}"/>
 
@@ -114,10 +119,27 @@
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTemplateColumn Header=" ">
+                    <DataGridTemplateColumn>
+                        <!--<DataGridTemplateColumn.Header>
+                                    <Button Content="Write All" Command="{Binding Path=DataContext.WriteAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
+                                </DataGridTemplateColumn.Header>-->
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Label/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Column="1" Margin="3"
+                                            Visibility="{Binding Path=DataContext.Recommended, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource recommendedValueToVisibility}}"
+                                            Command="{Binding Path=DataContext.BVCopyRecommended, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                            CommandParameter="{Binding}">
+                                        <IconPacks:Unicons Kind="AngleDoubleRight" Height="8" Width="8"/>
+                                    </Button>
+
+                                </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -143,7 +165,6 @@
                                 </Style>
                             </DataGridTextColumn.CellStyle>
                         </DataGridTextColumn>-->
-
 
                     <DataGridTemplateColumn Header="Write Value">
                         <DataGridTemplateColumn.CellTemplate>
@@ -203,7 +224,7 @@
                     <Button Content="Get All" Command="{Binding GetAllSettings}"/>
                 </StackPanel>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Settings}" AutoGenerateColumns="False" CanUserAddRows="False" CellEditEnding="DataGrid_CellEditEnding_1">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Settings}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Parameter Name" Binding="{Binding ParameterName, Mode=OneWay}"/>
 
@@ -306,6 +327,16 @@
                 </DataGrid>
             </Grid>
         </Border>
+
+        <StatusBar Grid.Row="4" Margin="3">
+            <StatusBarItem>
+                <TextBlock Text="Status: "/>
+            </StatusBarItem>
+            
+            <StatusBarItem>
+                <TextBlock Text="{Binding Status}"/>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 
 </mah:MetroWindow>
