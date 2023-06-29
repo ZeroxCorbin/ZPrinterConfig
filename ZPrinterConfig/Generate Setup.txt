@@ -1,0 +1,1 @@
+.\packages\Clowd.Squirrel.2.9.42\tools\Squirrel.exe pack --packId "ZPrinterConfig" --packVersion "0.1.4-pre" --packDirectory "ZPrinterConfig/bin/Release"

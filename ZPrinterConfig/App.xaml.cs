@@ -22,11 +22,11 @@ namespace ZPrinterConfig
         public static string Version;
         public static Databases.SimpleDatabase Settings { get; private set; }
 
-//#if DEBUG
+        //#if DEBUG
         public static string WorkingDir { get; set; } = System.IO.Directory.GetCurrentDirectory();
-//#else        
-//        public static string WorkingDir { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\TDD\\ZPrinterConfig\\";
-//#endif
+        //#else        
+        //        public static string WorkingDir { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\TDD\\ZPrinterConfig\\";
+        //#endif
 
         public static string UserDataDirectory => $"{WorkingDir}\\UserData";
         public static string MapDatabaseSettingsFile => "ApplicationSettings";
@@ -42,6 +42,8 @@ namespace ZPrinterConfig
                 onInitialInstall: OnAppInstall,
                 onAppUninstall: OnAppUninstall,
                 onEveryRun: OnAppRun);
+
+            _ = UpdateMyApp();
 
             if (!Directory.Exists(UserDataDirectory))
             {
@@ -95,9 +97,9 @@ namespace ZPrinterConfig
 
         private static async Task UpdateMyApp()
         {
-            using (var mgr = new UpdateManager("https://the.place/you-host/updates"))
+            using (var mgr = new GithubUpdateManager("https://github.com/ZeroxCorbin/ZPrinterConfig"))
             {
-                    var newVersion = await mgr.UpdateApp();
+                var newVersion = await mgr.UpdateApp();
 
                 // optionally restart the app automatically, or ask the user if/when they want to restart
                 if (newVersion != null)
@@ -109,111 +111,111 @@ namespace ZPrinterConfig
         }
 
 
-        public class GetCommandData
-        {
+        //public class GetCommandData
+        //{
 
-            public Dictionary<string, string> Commands { get; private set; } = new Dictionary<string, string>();
-            public GetCommandData()
-            {
-                using (StreamReader file = new StreamReader("Assets\\RAW Command List.txt"))
-                {
-                    StringBuilder sb = new StringBuilder();
+        //    public Dictionary<string, string> Commands { get; private set; } = new Dictionary<string, string>();
+        //    public GetCommandData()
+        //    {
+        //        using (StreamReader file = new StreamReader("Assets\\RAW Command List.txt"))
+        //        {
+        //            StringBuilder sb = new StringBuilder();
 
-                    bool build = false;
-                    string ln;
-                    string temp = "";
-                    string command = "";
-                    while ((ln = file.ReadLine()) != null)
-                    {
-                        if (Regex.IsMatch(ln, @"^!"))
-                        {
-                            if (Regex.IsMatch(ln, @"^! U1 getvar"))
-                            {
+        //            bool build = false;
+        //            string ln;
+        //            string temp = "";
+        //            string command = "";
+        //            while ((ln = file.ReadLine()) != null)
+        //            {
+        //                if (Regex.IsMatch(ln, @"^!"))
+        //                {
+        //                    if (Regex.IsMatch(ln, @"^! U1 getvar"))
+        //                    {
 
 
-                                if (Regex.IsMatch(ln, "\" \""))
-                                    continue;
-                                else
-                                    command = ln;
-                            }
-                            else if (Regex.IsMatch(ln, @"^! U1 setvar"))
-                            {
-                                if (!ln.EndsWith("\""))
-                                {
-                                    build = true;
-                                    temp = ln;
-                                    continue;
-                                }
-                                else
-                                {
-                                    int index = ln.IndexOf("\" \"");
-                                    if (index != -1)
-                                        command = ln.Substring(0, index);
-                                    else
-                                    {
-                                        command = ln;
-                                    }
-                                        
-                                }
-                                    
-                            }
-                            else
-                            {
-                                int index = ln.IndexOf("\" \"");
-                                if (index != -1)
-                                    command = ln.Substring(0, index);
-                                else
-                                {
-                                    command = ln;
-                                }
-                            }
+        //                        if (Regex.IsMatch(ln, "\" \""))
+        //                            continue;
+        //                        else
+        //                            command = ln;
+        //                    }
+        //                    else if (Regex.IsMatch(ln, @"^! U1 setvar"))
+        //                    {
+        //                        if (!ln.EndsWith("\""))
+        //                        {
+        //                            build = true;
+        //                            temp = ln;
+        //                            continue;
+        //                        }
+        //                        else
+        //                        {
+        //                            int index = ln.IndexOf("\" \"");
+        //                            if (index != -1)
+        //                                command = ln.Substring(0, index);
+        //                            else
+        //                            {
+        //                                command = ln;
+        //                            }
 
-                            if (!Commands.ContainsKey(command))
-                                Commands.Add(command, ln.Trim('\r', '\n'));
+        //                        }
 
-                            continue;
-                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        int index = ln.IndexOf("\" \"");
+        //                        if (index != -1)
+        //                            command = ln.Substring(0, index);
+        //                        else
+        //                        {
+        //                            command = ln;
+        //                        }
+        //                    }
 
-                        if (build)
-                        {
-                            temp += ln;
+        //                    if (!Commands.ContainsKey(command))
+        //                        Commands.Add(command, ln.Trim('\r', '\n'));
 
-                            command = temp.Substring(0, temp.IndexOf("\" \""));
-                            if (!Commands.ContainsKey(command))
-                                Commands.Add(command, temp.Trim(new char[] { '\r', '\n' }));
-                            build = false;
-                            //    if (ln.StartsWith("Ex"))
-                            //        continue;
+        //                    continue;
+        //                }
 
-                            //    if (ln.StartsWith("Con"))
-                            //        continue;
+        //                if (build)
+        //                {
+        //                    temp += ln;
 
-                            //    sb.Append(ln.Trim(new char[] { '\r', '\n' }));
+        //                    command = temp.Substring(0, temp.IndexOf("\" \""));
+        //                    if (!Commands.ContainsKey(command))
+        //                        Commands.Add(command, temp.Trim(new char[] { '\r', '\n' }));
+        //                    build = false;
+        //                    //    if (ln.StartsWith("Ex"))
+        //                    //        continue;
 
-                            //    if (ln.Contains(")"))
-                            //    {
-                            //        build = false;
-                            //        Commands.Add(sb.ToString());
-                            //        sb.Clear();
-                            //    }
-                        }
+        //                    //    if (ln.StartsWith("Con"))
+        //                    //        continue;
 
-                        //if (ln.StartsWith("syntax", StringComparison.OrdinalIgnoreCase))
-                        //    build = true;
-                    }
-                }
+        //                    //    sb.Append(ln.Trim(new char[] { '\r', '\n' }));
 
-                var sortedDict = from entry in Commands orderby entry.Value ascending select entry;
+        //                    //    if (ln.Contains(")"))
+        //                    //    {
+        //                    //        build = false;
+        //                    //        Commands.Add(sb.ToString());
+        //                    //        sb.Clear();
+        //                    //    }
+        //                }
 
-                using (StreamWriter file1 = new StreamWriter("Assets\\Command List.txt"))
-                {
-                    foreach (var kv in sortedDict)
-                    {
-                        file1.WriteLine($"{{ \"{kv.Value.Replace("! U1 ", "").Replace("\"", "")}\" }},");
-                    }
-                }
-                //File.WriteAllLines(, Commands.ToArray());
-            }
-        }
+        //                //if (ln.StartsWith("syntax", StringComparison.OrdinalIgnoreCase))
+        //                //    build = true;
+        //            }
+        //        }
+
+        //        var sortedDict = from entry in Commands orderby entry.Value ascending select entry;
+
+        //        using (StreamWriter file1 = new StreamWriter("Assets\\Command List.txt"))
+        //        {
+        //            foreach (var kv in sortedDict)
+        //            {
+        //                file1.WriteLine($"{{ \"{kv.Value.Replace("! U1 ", "").Replace("\"", "")}\" }},");
+        //            }
+        //        }
+        //        //File.WriteAllLines(, Commands.ToArray());
+        //    }
+        //}
     }
 }
