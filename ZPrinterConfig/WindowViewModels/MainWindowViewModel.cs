@@ -34,7 +34,7 @@ namespace ZPrinterConfig.WindowViewModele
             new PrinterController.PrinterSetting() { Name= "Reprint Mode", ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
             new PrinterController.PrinterSetting() { Name= "Reprint Void", ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
             new PrinterController.PrinterSetting() { Name= "Reprint Void Length", ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
-            new PrinterController.PrinterSetting() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1 - 4" },
+            new PrinterController.PrinterSetting() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1, 2, 3, 4" },
             new PrinterController.PrinterSetting() { Name= "Start Print Signal", ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
             new PrinterController.PrinterSetting() { Name= "Tear Off", ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
             new PrinterController.PrinterSetting() { Name= "Print Mode", ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
@@ -296,6 +296,11 @@ namespace ZPrinterConfig.WindowViewModele
 
         private async void WriteAction(object parameter)
         {
+            PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+
+            if (string.IsNullOrEmpty(ps.WriteValue))
+                return;
+
             string ip = GetIPAddress();
             if (ip == null)
             {
@@ -309,7 +314,7 @@ namespace ZPrinterConfig.WindowViewModele
 
             if (Printer.Connect(ip, Port))
             {
-                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+                
 
                 Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n");
 

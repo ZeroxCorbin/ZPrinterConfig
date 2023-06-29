@@ -6,17 +6,21 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:local="clr-namespace:ZPrinterConfig.WindowViewModele"
+                 xmlns:Convert="clr-namespace:ZPrinterConfig.Converters"
         xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
         xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
         Dialog:DialogParticipation.Register="{Binding}"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
-        SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" PreviewKeyDown="MetroWindow_PreviewKeyDown">
+        SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" PreviewKeyDown="MetroWindow_PreviewKeyDown">
+    
     <mah:MetroWindow.DataContext>
         <local:MainWindowViewModel/>
     </mah:MetroWindow.DataContext>
 
-
+    <mah:MetroWindow.Resources>
+        <Convert:BindingProxy x:Key="bindingProxy" Data="{Binding}"/>
+    </mah:MetroWindow.Resources>
 
     <mah:MetroWindow.Title>
         <MultiBinding StringFormat="ZPrinterConfig : {0}">
@@ -47,156 +51,148 @@
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 
-    <Grid>
-        
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        
-        <Grid Grid.Row="0" Margin="5" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
-                <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
-                    <Label Content="Printer Connection Details" Margin="3"/>
-                    <TextBox mah:TextBoxHelper.Watermark="Printer IP / Host" Margin="3"
+    <Grid Margin="5" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
+            <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
+                <Label Content="Printer Connection Details" Margin="3"/>
+                <TextBox mah:TextBoxHelper.Watermark="Printer IP / Host" Margin="3"
                          Text="{Binding Host}" MinWidth="80"/>
-                    <TextBox mah:TextBoxHelper.Watermark="Port" Margin="3"
+                <TextBox mah:TextBoxHelper.Watermark="Port" Margin="3"
                          Text="{Binding Port}" MinWidth="80"/>
 
-                    <Button Grid.Column="1" Margin="0,3" Name="btnResetPortNumber"
+                <Button Grid.Column="1" Margin="0,3" Name="btnResetPortNumber"
                             ToolTip="Reset port number." Click="btnResetPortNumber_Click">
-                        <IconPacks:PackIconRadixIcons Kind="Reset"/>
-                    </Button>
+                    <IconPacks:PackIconRadixIcons Kind="Reset"/>
+                </Button>
 
-                    <Label Content="{Binding Status}"/>
-                    
-                </StackPanel>
-            </Border>
-            
-            <Border Grid.Row="1" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
-                <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
-                    <Label Content="Select a Label Type: " Margin="3"/>
-                    <ComboBox ItemsSource="{Binding BVOperationTypes}" SelectedValue="{Binding BVSelectedOperationType}" MinWidth="100" Margin="3"/>
-                </StackPanel>
-            </Border>
+                <Label Content="{Binding Status}"/>
 
-            <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
+            </StackPanel>
+        </Border>
 
-                <DataGrid ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" CellEditEnding="DataGrid_CellEditEnding"  Margin="3">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Parameter Name"  Binding="{Binding Name, Mode=OneWay}"/>
+        <Border Grid.Row="1" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
+            <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
+                <Label Content="Select a Label Type: " Margin="3"/>
+                <ComboBox ItemsSource="{Binding BVOperationTypes}" SelectedValue="{Binding BVSelectedOperationType}" MinWidth="100" Margin="3"/>
+            </StackPanel>
+        </Border>
 
-                        <DataGridTextColumn Header="Parameter Path" Binding="{Binding ParameterName, Mode=OneWay}"/>
+        <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
 
-                        <DataGridTextColumn Header="Options" Binding="{Binding Options, Mode=OneWay}"/>
+            <DataGrid x:Name="dgBVParameters" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" 
+                          CellEditEnding="DataGrid_CellEditEnding" Margin="3" SelectionChanged="DataGrid_SelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Parameter Name"  Binding="{Binding Name, Mode=OneWay}"/>
 
-                        <DataGridTextColumn Header="Default" Binding="{Binding Default, Mode=OneWay}">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                                    <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
+                    <DataGridTextColumn Header="Parameter Path" Binding="{Binding ParameterName, Mode=OneWay}"/>
 
-                        <DataGridTextColumn Header="Recommended" Binding="{Binding Recommended, Mode=OneWay}">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="TextBlock.TextAlignment" Value="Right" />
-                                    <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
+                    <DataGridTextColumn Header="Options" Binding="{Binding Options, Mode=OneWay}"/>
 
-                        <DataGridTemplateColumn Header=" ">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Label/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Default" Binding="{Binding Default, Mode=OneWay}">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="Write Value" Binding="{Binding WriteValue}">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                                    <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
+                    <DataGridTextColumn Header="Recommended" Binding="{Binding Recommended, Mode=OneWay}">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="TextBlock.TextAlignment" Value="Right" />
+                                <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
 
-                        <DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header=" ">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Label/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--<DataGridTemplateColumn>
+
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition/>
-                                        </Grid.ColumnDefinitions>
-                                        <Button Grid.Column="1" Command="{Binding Path=DataContext.BVWrite, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
-                                            CommandParameter="{Binding}"
-                                            Margin="3">
-                                            <IconPacks:Unicons Kind="Edit" Height="20" Width="20"/>
-                                        </Button>
+                                        <ComboBox ItemsSource="{Binding Options, Converter={StaticResource csvStringToArray}}">
+
+                                        </ComboBox>
                                     </Grid>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                        </DataGridTemplateColumn>-->
 
-
-
-                        <!--<DataGridTemplateColumn>
-                                <DataGridTemplateColumn.Header>
-                                    <Button Content="Read All" Command="{Binding Path=DataContext.BVReadAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="auto"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="1" Command="{Binding Path=DataContext.BVRead, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
-                                            CommandParameter="{Binding}"
-                                                Margin="3">
-                                                <IconPacks:Unicons Kind="Sync" Height="20" Width="20"/>
-                                            </Button>
-                                        </Grid>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>-->
-
-                        <DataGridTextColumn Binding="{Binding ReadValue}">
-                            <DataGridTextColumn.Header>
-                                <StackPanel>
-                                    <Button Content="Read All" Command="{Binding Path=DataContext.BVReadAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
-                                    <!--<Label Content="VALUE" HorizontalAlignment="Center"/>-->
-                                </StackPanel>
-
-                            </DataGridTextColumn.Header>
+                    <!--<DataGridTextColumn Header="Write Value" Binding="{Binding WriteValue}">
                             <DataGridTextColumn.CellStyle>
                                 <Style TargetType="DataGridCell">
                                     <Setter Property="TextBlock.TextAlignment" Value="Center" />
                                     <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
                                 </Style>
                             </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>-->
 
-                        </DataGridTextColumn>
 
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Border>
-        </Grid>
+                    <DataGridTemplateColumn Header="Write Value">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBox Text="{Binding WriteValue}" TextChanged="TextBox_TextChanged"/>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-        <Border x:Name="bdrAllParams" Visibility="Collapsed" Grid.Row="1" Padding="10" Margin="5" BorderThickness="2" CornerRadius="3" BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="1" Command="{Binding Path=DataContext.BVWrite, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                            CommandParameter="{Binding}"
+                                            Margin="3">
+                                        <IconPacks:Unicons Kind="Edit" Height="20" Width="20"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Binding="{Binding ReadValue}">
+                        <DataGridTextColumn.Header>
+                            <Button Content="Read All" Command="{Binding Path=DataContext.BVReadAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
+                        </DataGridTextColumn.Header>
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+
+                    </DataGridTextColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Border x:Name="bdrAllParams" Visibility="Collapsed" Grid.Row="3" MaxHeight="400"
+                 Margin="3" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
@@ -230,14 +226,23 @@
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>-->
 
-                        <DataGridTextColumn Header="Write Value" Binding="{Binding WriteValue}">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                                    <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
+                        <DataGridTemplateColumn Header=" ">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Write Value">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <TextBox Text="{Binding WriteValue}" TextChanged="TextBox_TextChanged"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
                         <DataGridTemplateColumn>
                             <!--<DataGridTemplateColumn.Header>
@@ -261,20 +266,15 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn Header=" ">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Label/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
                         <DataGridTemplateColumn>
                             <DataGridTemplateColumn.Header>
-                                <Button Content="Read All" Command="{Binding Path=DataContext.ReadAll, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
+
+                                <Button Content="Read All" Command="{Binding Path=Data.ReadAll, Source={StaticResource bindingProxy}}"/>
+
                             </DataGridTemplateColumn.Header>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
+
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
@@ -287,6 +287,7 @@
                                             <IconPacks:Unicons Kind="Sync" Height="20" Width="20"/>
                                         </Button>
                                     </Grid>
+
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -305,7 +306,6 @@
                 </DataGrid>
             </Grid>
         </Border>
-
-
     </Grid>
+
 </mah:MetroWindow>

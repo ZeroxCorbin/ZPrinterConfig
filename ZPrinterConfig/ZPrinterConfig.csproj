@@ -149,6 +149,8 @@
     <Compile Include="Controllers\PrinterController.cs" />
     <Compile Include="Controllers\SocketStatesEnum.cs" />
     <Compile Include="Controllers\V275_NodeController.cs" />
+    <Compile Include="Converters\BindingProxy.cs" />
+    <Compile Include="Converters\CSVStringToArray.cs" />
     <Compile Include="Dialogs\ImageViewerDialogView.xaml.cs">
       <DependentUpon>ImageViewerDialogView.xaml</DependentUpon>
     </Compile>

@@ -29,7 +29,7 @@ namespace ZPrinterConfig.WindowViews
 
         private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            ((Controllers.PrinterController.PrinterSetting)e.EditingElement.DataContext).WriteValue = ((TextBox)e.EditingElement).Text;
+
         }
 
         private void DataGrid_CellEditEnding_1(object sender, DataGridCellEditEndingEventArgs e)
@@ -59,6 +59,17 @@ namespace ZPrinterConfig.WindowViews
 
                 }
             }
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ((Controllers.PrinterController.PrinterSetting)((TextBox)e.Source).DataContext).WriteValue = ((TextBox)e.Source).Text;
+        }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            dgBVParameters.UnselectAll();
+            dgBVParameters.UnselectAllCells();
         }
     }
 }
