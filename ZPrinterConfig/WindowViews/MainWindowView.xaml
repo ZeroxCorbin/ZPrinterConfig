@@ -11,10 +11,12 @@
         Dialog:DialogParticipation.Register="{Binding}"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
-        SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen">
+        SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" PreviewKeyDown="MetroWindow_PreviewKeyDown">
     <mah:MetroWindow.DataContext>
         <local:MainWindowViewModel/>
     </mah:MetroWindow.DataContext>
+
+
 
     <mah:MetroWindow.Title>
         <MultiBinding StringFormat="ZPrinterConfig : {0}">
@@ -46,8 +48,13 @@
     </mah:MetroWindow.RightWindowCommands>
 
     <Grid>
-
-        <Grid Margin="5" >
+        
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0" Margin="5" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -189,7 +196,7 @@
             </Border>
         </Grid>
 
-        <Border Visibility="Collapsed" Grid.Row="2" Padding="10" Margin="5" BorderThickness="2" CornerRadius="3" BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
+        <Border x:Name="bdrAllParams" Visibility="Collapsed" Grid.Row="1" Padding="10" Margin="5" BorderThickness="2" CornerRadius="3" BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>

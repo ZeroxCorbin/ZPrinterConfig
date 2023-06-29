@@ -20,7 +20,7 @@ namespace ZPrinterConfig.WindowViewModele
         private PrinterController Printer { get; } = new PrinterController();
 
         public string Host { get => App.Settings.GetValue("PrinterHost", ""); set => App.Settings.SetValue("PrinterHost", value); }
-        public string Port { get => App.Settings.GetValue("PrinterPort", "9100"); set => App.Settings.SetValue("PrinterPort", value); }
+        public string Port { get => App.Settings.GetValue("PrinterPort", "9100"); set {  App.Settings.SetValue("PrinterPort", value); OnPropertyChanged("Port"); }  }
 
         public string Status
         {

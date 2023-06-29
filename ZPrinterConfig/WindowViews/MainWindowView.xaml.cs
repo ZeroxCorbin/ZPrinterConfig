@@ -34,7 +34,7 @@ namespace ZPrinterConfig.WindowViews
 
         private void DataGrid_CellEditEnding_1(object sender, DataGridCellEditEndingEventArgs e)
         {
-((Controllers.PrinterController.PrinterSetting)e.EditingElement.DataContext).WriteValue = ((TextBox)e.EditingElement).Text;
+            ((Controllers.PrinterController.PrinterSetting)e.EditingElement.DataContext).WriteValue = ((TextBox)e.EditingElement).Text;
         }
 
         private void btnLightTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Light.Steel");
@@ -43,7 +43,22 @@ namespace ZPrinterConfig.WindowViews
 
         private void btnResetPortNumber_Click(object sender, RoutedEventArgs e)
         {
+            ((MainWindowViewModel)DataContext).Port = "9100";
+        }
 
+        private void MetroWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if ((Keyboard.Modifiers) == (ModifierKeys.Control | ModifierKeys.Alt))
+            {
+                if (Keyboard.IsKeyDown(Key.A))
+                {
+                    if (bdrAllParams.Visibility == Visibility.Collapsed)
+                        bdrAllParams.Visibility = Visibility.Visible;
+                    else
+                        bdrAllParams.Visibility = Visibility.Collapsed;
+
+                }
+            }
         }
     }
 }
