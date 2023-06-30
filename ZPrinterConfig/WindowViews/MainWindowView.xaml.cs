@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ZPrinterConfig.Models;
 using ZPrinterConfig.WindowViewModele;
 
 namespace ZPrinterConfig.WindowViews
@@ -33,7 +34,7 @@ namespace ZPrinterConfig.WindowViews
 
         private void btnResetPortNumber_Click(object sender, RoutedEventArgs e)
         {
-            ((MainWindowViewModel)DataContext).Port = "9100";
+            ((MainWindowViewModel)DataContext).Port = "6101";
         }
 
         private void MetroWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -53,7 +54,7 @@ namespace ZPrinterConfig.WindowViews
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ((Controllers.PrinterController.PrinterSetting)((TextBox)e.Source).DataContext).WriteValue = ((TextBox)e.Source).Text;
+            ((PrinterParameter)((TextBox)e.Source).DataContext).WriteValue = ((TextBox)e.Source).Text;
         }
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -61,5 +62,12 @@ namespace ZPrinterConfig.WindowViews
             dgBVParameters.UnselectAll();
             dgBVParameters.UnselectAllCells();
         }
+
+        //private void btnDescription_Click(object sender, RoutedEventArgs e)
+        //{
+        //    popDescription.IsOpen = false;
+        //    popDescription.PlacementTarget = (Button)sender;
+        //    popDescription.IsOpen = true;
+        //}
     }
 }

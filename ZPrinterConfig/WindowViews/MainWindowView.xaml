@@ -90,14 +90,46 @@
             </StackPanel>
         </Border>
 
+        <!--<Popup x:Name="popDescription">
+            <TextBlock Text="Hello"/>
+        </Popup>-->
+        
         <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
 
             <DataGrid x:Name="dgBVParameters" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False"
                           Margin="3" SelectionChanged="DataGrid_SelectionChanged">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Parameter Name"  Binding="{Binding Name, Mode=OneWay}"/>
 
-                    <DataGridTextColumn Header="Parameter Path" Binding="{Binding ParameterName, Mode=OneWay}"/>
+                    <DataGridTemplateColumn Header="Parameter Name" >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="{Binding Name, Mode=OneWay}" ToolTip="{Binding Description}"/>
+                                    <!--<Button Click="btnDescription_Click" Style="{DynamicResource MahApps.Styles.Button.Chromeless}">
+                                        <IconPacks:PackIconUnicons Kind="CommentInfo" Height="15" Width="15" ToolTip=""/>
+                                    </Button>-->
+                                    
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Parameter Path">
+                                                <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label ToolTip="{Binding Description}">
+                                        <TextBlock Text="{Binding ParameterName, Mode=OneWay}"/>
+                                    </Label>
+                                    <!--<Button Click="btnDescription_Click" Style="{DynamicResource MahApps.Styles.Button.Chromeless}">
+                                        <IconPacks:PackIconUnicons Kind="CommentInfo" Height="15" Width="15" ToolTip=""/>
+                                    </Button>-->
+                                    
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
 
                     <DataGridTextColumn Header="Options" Binding="{Binding Options, Mode=OneWay}"/>
 

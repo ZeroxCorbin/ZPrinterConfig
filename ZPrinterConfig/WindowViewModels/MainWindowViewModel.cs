@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZPrinterConfig.Controllers;
+using ZPrinterConfig.Models;
 
 namespace ZPrinterConfig.WindowViewModele
 {
@@ -20,7 +21,7 @@ namespace ZPrinterConfig.WindowViewModele
         private PrinterController Printer { get; } = new PrinterController();
 
         public string Host { get => App.Settings.GetValue("PrinterHost", ""); set => App.Settings.SetValue("PrinterHost", value); }
-        public string Port { get => App.Settings.GetValue("PrinterPort", "9100"); set { App.Settings.SetValue("PrinterPort", value); OnPropertyChanged("Port"); } }
+        public string Port { get => App.Settings.GetValue("PrinterPort", "6101"); set { App.Settings.SetValue("PrinterPort", value); OnPropertyChanged("Port"); } }
 
         public string Status
         {
@@ -37,20 +38,20 @@ namespace ZPrinterConfig.WindowViewModele
         }
         private string _SocketStatus;
 
-        public ObservableCollection<PrinterController.PrinterSetting> BVSettings { get; } = new ObservableCollection<PrinterController.PrinterSetting>()
+        public ObservableCollection<PrinterParameter> BVSettings { get; } = new ObservableCollection<PrinterParameter>()
         {
-            new PrinterController.PrinterSetting() { Name= "Reprint Mode", ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off" },
-            new PrinterController.PrinterSetting() { Name= "Reprint Void", ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom" },
-            new PrinterController.PrinterSetting() { Name= "Reprint Void Length", ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000" },
-            new PrinterController.PrinterSetting() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1, 2, 3, 4" , Recommended = ""},
-            new PrinterController.PrinterSetting() { Name= "Start Print Signal", ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse" },
-            new PrinterController.PrinterSetting() { Name= "Tear Off", ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
-            new PrinterController.PrinterSetting() { Name= "Print Mode", ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
-            new PrinterController.PrinterSetting() { Name= "Applicator", ParameterName = "device.applicator.end_print", Default = "1",  Options = "off, 1" },
+            new PrinterParameter() { Name= "Reprint Mode", ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off", Description = "This setting turns on/off the reprint mode." },
+            new PrinterParameter() { Name= "Reprint Void", ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom", Description = "This setting allows the user to enable the backup and void functionality (if reprint_mode is on)." },
+            new PrinterParameter() { Name= "Reprint Void Length", ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000", Description = "This setting allows the user to set a custom backup and void distance in dots.\r\nThis is only applied when ezpl.reprint_void is set to \"custom\"." },
+            new PrinterParameter() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1, 2, 3, 4" , Recommended = "", Description = "This setting allows the user to set which void pattern to use.\r\nThere are four different patterns provided depending on customer preference.\r\nDifferent patterns have different levels of black applied across the\r\ncourse of the label, which can affect physical behavior such as labels sticking\r\nto ribbon, ribbon wrinkle, or ribbon tears.\r\nPattern two is specifically chosen to prevent any barcodes from being scannable after the void is applied."},
+            new PrinterParameter() { Name= "Start Print Signal", ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse", Description = "This setting selects the applicator port START PRINT mode of operation." },
+            new PrinterParameter() { Name= "Tear Off", ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
+            new PrinterParameter() { Name= "Print Mode", ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
+            new PrinterParameter() { Name= "Applicator", ParameterName = "device.applicator.end_print", Default = "1",  Options = "off, 1" },
         };
         public ObservableCollection<string> BVOperationTypes { get; } = new ObservableCollection<string>()
         {
-            "Backup/Void Ribbon",
+            "Backup/Void Transfer",
             "Backup/Void Direct",
             "Normal",
         };
@@ -66,7 +67,7 @@ namespace ZPrinterConfig.WindowViewModele
         public ICommand BVCopyRecommended { get; }
         public ICommand BVWrite { get; }
 
-        public ObservableCollection<PrinterController.PrinterSetting> Settings { get; } = new ObservableCollection<PrinterController.PrinterSetting>();
+        public ObservableCollection<PrinterParameter> Settings { get; } = new ObservableCollection<PrinterParameter>();
 
         public ICommand GetAllSettings { get; }
 
@@ -131,7 +132,7 @@ namespace ZPrinterConfig.WindowViewModele
 
         private void BVSelectedOperationType_Changed(string value)
         {
-            if (value == "Backup/Void Ribbon")
+            if (value == "Backup/Void Transfer")
             {
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_mode").Recommended = "on";
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_void").Recommended = "custom";
@@ -180,7 +181,7 @@ namespace ZPrinterConfig.WindowViewModele
 
                 if (Printer.Connect(ip, Port))
                 {
-                    PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+                    PrinterParameter ps = (PrinterParameter)parameter;
 
                     Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
                     string res = Printer.Recieve(1000);
@@ -210,7 +211,7 @@ namespace ZPrinterConfig.WindowViewModele
 
                 if (Printer.Connect(ip, Port))
                 {
-                    foreach (PrinterController.PrinterSetting ps in BVSettings)
+                    foreach (PrinterParameter ps in BVSettings)
                     {
                         Printer.Send($"! U1 getvar \"{ps.ParameterName}\" \r\n");
                         string res = Printer.Recieve(1000);
@@ -226,7 +227,7 @@ namespace ZPrinterConfig.WindowViewModele
         }
         private void BVCopyRecommendedAction(object parameter)
         {
-            PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+            PrinterParameter ps = (PrinterParameter)parameter;
 
             if (string.IsNullOrEmpty(ps.Recommended))
                 return;
@@ -253,7 +254,7 @@ namespace ZPrinterConfig.WindowViewModele
 
                 if (Printer.Connect(ip, Port))
                 {
-                    PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+                    PrinterParameter ps = (PrinterParameter)parameter;
 
                     //Printer.Send($"! U1 getvar \"\" \"\"\r\n");
                     Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n ");
@@ -312,7 +313,7 @@ namespace ZPrinterConfig.WindowViewModele
             {
                 Status = "Reading parameter.";
 
-                PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+                PrinterParameter ps = (PrinterParameter)parameter;
 
                 Printer.Send($"! U1 getvar \"{ps.ParameterName}\"\r\n");
                 string res = Printer.Recieve(1000, "\"");
@@ -341,7 +342,7 @@ namespace ZPrinterConfig.WindowViewModele
 
                 if (Printer.Connect(ip, Port))
                 {
-                    foreach (PrinterController.PrinterSetting ps in Settings)
+                    foreach (PrinterParameter ps in Settings)
                     {
                         if (ps.ParameterName.StartsWith("file"))
                             continue;
@@ -364,7 +365,7 @@ namespace ZPrinterConfig.WindowViewModele
         {
             _ = Task.Run(ResetStatus);
 
-            PrinterController.PrinterSetting ps = (PrinterController.PrinterSetting)parameter;
+            PrinterParameter ps = (PrinterParameter)parameter;
 
             if (string.IsNullOrEmpty(ps.WriteValue))
                 return;

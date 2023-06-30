@@ -4,29 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZPrinterConfig.Models;
 
 namespace ZPrinterConfig.Controllers
 {
     public class PrinterController
     {
-        public class PrinterSetting : Core.BaseViewModel
-        {
-            public string Name { get; internal set; }
 
-            public string ParameterName { get; internal set; }
-
-            public string WriteValue { get => App.Settings.GetValue(ParameterName, Default);
-                set { App.Settings.SetValue(ParameterName, value); OnPropertyChanged("WriteValue"); }
-            }
-            public string ReadValue { get => _ReadValue; set => SetProperty(ref _ReadValue, value); }
-            private string _ReadValue;
-            public string Default { get; internal set; }
-
-            public string Recommended { get => _Recommended; set => SetProperty(ref _Recommended, value); }
-            private string _Recommended;
-
-            public string Options { get; internal set; }
-        }
 
         private AsyncSocket.ASocketManager Socket { get; }
 
@@ -105,9 +89,9 @@ namespace ZPrinterConfig.Controllers
 
         }
 
-        public List<PrinterSetting> GetAllSettings(string ip, string port)
+        public List<PrinterParameter> GetAllSettings(string ip, string port)
         {
-            List<PrinterSetting> settings = new List<PrinterSetting>();
+            List<PrinterParameter> settings = new List<PrinterParameter>();
 
             if (Connect(ip, port))
             {
@@ -116,7 +100,7 @@ namespace ZPrinterConfig.Controllers
                 foreach(var line in Socket.Receive(1000, "\"\"").Split('\n'))
                 {
                     if(!line.TrimEnd('\r').EndsWith("."))
-                        settings.Add(new PrinterSetting() { ParameterName = line.TrimEnd('\r') });
+                        settings.Add(new PrinterParameter() { ParameterName = line.TrimEnd('\r') });
                 }
                 settings.Remove(settings.Last());
 
@@ -136,7 +120,7 @@ namespace ZPrinterConfig.Controllers
                                 try
                                 {
                                     name = name.TrimEnd(',');
-                                    PrinterSetting setting = settings.First(x => x.ParameterName == name); 
+                                    PrinterParameter setting = settings.First(x => x.ParameterName == name); 
                                     setting.Options = line.Substring(line.IndexOf("Choices:") + "Choices:".Length);
                                 }
                                 catch 

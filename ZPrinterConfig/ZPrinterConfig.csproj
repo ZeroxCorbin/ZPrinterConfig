@@ -156,6 +156,7 @@
       <DependentUpon>ImageViewerDialogView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ImageViewerDialogViewModel.cs" />
+    <Compile Include="Models\PrinterParameter.cs" />
     <Compile Include="Models\ZebraCommands.cs" />
     <Compile Include="WindowViewModels\MainWindowViewModel.cs" />
     <Compile Include="WindowViews\MainWindowView.xaml.cs">
@@ -218,9 +219,7 @@
       <Name>AsyncSocket</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\HelpImages\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
