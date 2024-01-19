@@ -1,18 +1,9 @@
 ﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using ZPrinterConfig.Models;
 using ZPrinterConfig.WindowViewModele;
 
@@ -29,7 +20,6 @@ namespace ZPrinterConfig.WindowViews
         }
 
         private void btnLightTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Light.Steel");
-
         private void btnDarkTheme_Click(object sender, RoutedEventArgs e) => ThemeManager.Current.ChangeTheme(App.Current, "Dark.Steel");
 
         private void btnResetPortNumber_Click(object sender, RoutedEventArgs e)
@@ -62,12 +52,5 @@ namespace ZPrinterConfig.WindowViews
             dgBVParameters.UnselectAll();
             dgBVParameters.UnselectAllCells();
         }
-
-        //private void btnDescription_Click(object sender, RoutedEventArgs e)
-        //{
-        //    popDescription.IsOpen = false;
-        //    popDescription.PlacementTarget = (Button)sender;
-        //    popDescription.IsOpen = true;
-        //}
     }
 }

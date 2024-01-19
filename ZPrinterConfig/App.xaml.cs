@@ -28,8 +28,8 @@ namespace ZPrinterConfig
         //#endif
 
         public static string UserDataDirectory => $"{WorkingDir}\\UserData";
-        public static string MapDatabaseSettingsFile => "ApplicationSettings";
-        public static string MapDatabaseExtension => ".sqlite";
+        public static string ApplicationSettingsFile => "ApplicationSettings";
+        public static string ApplicationSettingsExtension => ".sqlite";
 
         public App()
         {
@@ -42,7 +42,7 @@ namespace ZPrinterConfig
                 _ = Directory.CreateDirectory(UserDataDirectory);
             }
 
-            Settings = new Databases.SimpleDatabase().Init(Path.Combine(UserDataDirectory, $"{MapDatabaseSettingsFile}{MapDatabaseExtension}"), false);
+            Settings = new Databases.SimpleDatabase().Init(Path.Combine(UserDataDirectory, $"{ApplicationSettingsFile}{ApplicationSettingsExtension}"), false);
 
             if (Settings == null)
             {
@@ -58,7 +58,7 @@ namespace ZPrinterConfig
             _ = ThemeManager.Current.ChangeTheme(this, Settings.GetValue("App.Theme", "Light.Steel"));
 
             ThemeManager.Current.ThemeChanged += Current_ThemeChanged;
-            ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
+            //ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
         }
         private void Current_ThemeChanged(object sender, ThemeChangedEventArgs e) => App.Settings.SetValue("App.Theme", e.NewTheme.Name);
 
