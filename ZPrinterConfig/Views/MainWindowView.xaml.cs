@@ -1,13 +1,11 @@
 ﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ZPrinterConfig.Models;
-using ZPrinterConfig.WindowViewModele;
+using ZPrinterConfig.ViewModels;
 
-namespace ZPrinterConfig.WindowViews
+namespace ZPrinterConfig.Views
 {
     /// <summary>
     /// Interaction logic for MainWindowView.xaml
@@ -29,17 +27,17 @@ namespace ZPrinterConfig.WindowViews
 
         private void MetroWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if ((Keyboard.Modifiers) == (ModifierKeys.Control | ModifierKeys.Alt))
-            {
-                if (Keyboard.IsKeyDown(Key.A))
-                {
-                    if (bdrAllParams.Visibility == Visibility.Collapsed)
-                        bdrAllParams.Visibility = Visibility.Visible;
-                    else
-                        bdrAllParams.Visibility = Visibility.Collapsed;
+            //if ((Keyboard.Modifiers) == (ModifierKeys.Control | ModifierKeys.Alt))
+            //{
+            //    if (Keyboard.IsKeyDown(Key.A))
+            //    {
+            //        if (bdrAllParams.Visibility == Visibility.Collapsed)
+            //            bdrAllParams.Visibility = Visibility.Visible;
+            //        else
+            //            bdrAllParams.Visibility = Visibility.Collapsed;
 
-                }
-            }
+            //    }
+            //}
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)

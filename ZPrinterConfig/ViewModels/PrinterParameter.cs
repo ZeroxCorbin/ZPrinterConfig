@@ -1,12 +1,13 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZPrinterConfig.Models
+namespace ZPrinterConfig.ViewModels
 {
-    public class PrinterParameter : Core.BaseViewModel
+    public class PrinterParameter : ObservableObject
     {
         public string Name { get; internal set; }
 

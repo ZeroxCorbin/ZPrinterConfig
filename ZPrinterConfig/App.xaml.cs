@@ -19,17 +19,13 @@ namespace ZPrinterConfig
     public partial class App : Application
     {
         public static string Version;
-        public static Databases.SimpleDatabase Settings { get; private set; }
 
-        //#if DEBUG
         public static string WorkingDir { get; set; } = System.IO.Directory.GetCurrentDirectory();
-        //#else        
-        //        public static string WorkingDir { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\TDD\\ZPrinterConfig\\";
-        //#endif
-
         public static string UserDataDirectory => $"{WorkingDir}\\UserData";
         public static string ApplicationSettingsFile => "ApplicationSettings";
         public static string ApplicationSettingsExtension => ".sqlite";
+
+        public static Databases.SimpleDatabase Settings { get; private set; }
 
         public App()
         {
@@ -54,11 +50,9 @@ namespace ZPrinterConfig
         {
             base.OnStartup(e);
 
-            // Set the application theme to Dark.Green
             _ = ThemeManager.Current.ChangeTheme(this, Settings.GetValue("App.Theme", "Light.Steel"));
 
             ThemeManager.Current.ThemeChanged += Current_ThemeChanged;
-            //ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
         }
         private void Current_ThemeChanged(object sender, ThemeChangedEventArgs e) => App.Settings.SetValue("App.Theme", e.NewTheme.Name);
 
