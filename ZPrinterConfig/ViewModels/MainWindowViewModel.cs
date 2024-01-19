@@ -135,7 +135,7 @@ namespace ZPrinterConfig.ViewModels
             ps.WriteValue = ps.Recommended;
         }
         [RelayCommand]
-        private async void Write(object parameter)
+        private async Task Write(object parameter)
         {
             _ = Task.Run(ResetStatus);
 
