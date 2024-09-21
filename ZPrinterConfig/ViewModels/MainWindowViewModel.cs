@@ -15,34 +15,26 @@ namespace ZPrinterConfig.ViewModels
 
         private PrinterController Printer { get; } = new PrinterController();
 
-        public string Host { get => App.Settings.GetValue("PrinterHost", ""); set => App.Settings.SetValue("PrinterHost", value); }
-        public string Port { get => App.Settings.GetValue("PrinterPort", "6101"); set { App.Settings.SetValue("PrinterPort", value); OnPropertyChanged("Port"); } }
+        [ObservableProperty] private string host = App.Settings.GetValue(nameof(Host), "");
+        partial void OnHostChanged(string value) => App.Settings.SetValue(nameof(Host), value);
 
-        public string Status
-        {
-            get { return _Status; }
-            set { SetProperty(ref _Status, value); }
-        }
-        private string _Status;
+        [ObservableProperty] private string port = App.Settings.GetValue(nameof(Port), "6101");
+        partial void OnPortChanged(string value) => App.Settings.SetValue(nameof(Port), value);
 
-        public string SocketStatus
-        {
-            get { return _SocketStatus; }
-            set { SetProperty(ref _SocketStatus, value); }
-        }
-        private string _SocketStatus;
+        [ObservableProperty] private string _Status;
+        [ObservableProperty] private string _SocketStatus;
 
-        public ObservableCollection<PrinterParameter> BVSettings { get; } = new ObservableCollection<PrinterParameter>()
-        {
-            new PrinterParameter() { Name= "Reprint Mode", ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off", Description = "This setting turns on/off the reprint mode." },
-            new PrinterParameter() { Name= "Reprint Void", ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom", Description = "This setting allows the user to enable the backup and void functionality (if reprint_mode is on)." },
-            new PrinterParameter() { Name= "Reprint Void Length", ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000", Description = "This setting allows the user to set a custom backup and void distance in dots.\r\nThis is only applied when ezpl.reprint_void is set to \"custom\"." },
-            new PrinterParameter() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1, 2, 3, 4" , Recommended = "", Description = "This setting allows the user to set which void pattern to use.\r\nThere are four different patterns provided depending on customer preference.\r\nDifferent patterns have different levels of black applied across the\r\ncourse of the label, which can affect physical behavior such as labels sticking\r\nto ribbon, ribbon wrinkle, or ribbon tears.\r\nPattern two is specifically chosen to prevent any barcodes from being scannable after the void is applied."},
-            new PrinterParameter() { Name= "Start Print Signal", ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse", Description = "This setting selects the applicator port START PRINT mode of operation." },
-            new PrinterParameter() { Name= "Tear Off", ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
-            new PrinterParameter() { Name= "Print Mode", ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
-            new PrinterParameter() { Name= "Applicator", ParameterName = "device.applicator.end_print", Default = "1",  Options = "off, 1" },
-        };
+        public ObservableCollection<PrinterParameter> BVSettings { get; } =
+        [
+            new() { Name= "Reprint Mode", ParameterName = "ezpl.reprint_mode", Default = "off", Options = "on, off", Description = "This setting turns on/off the reprint mode." },
+            new() { Name= "Reprint Void", ParameterName = "ezpl.reprint_void", Default = "off", Options = "on, off, custom", Description = "This setting allows the user to enable the backup and void functionality (if reprint_mode is on)." },
+            new() { Name= "Reprint Void Length", ParameterName = "ezpl.reprint_void_length", Default = "203", Options = "1 - 32000", Description = "This setting allows the user to set a custom backup and void distance in dots.\r\nThis is only applied when ezpl.reprint_void is set to \"custom\"." },
+            new() { Name= "Reprint Void Pattern", ParameterName = "ezpl.reprint_void_pattern", Default = "1", Options = "1, 2, 3, 4" , Recommended = "", Description = "This setting allows the user to set which void pattern to use.\r\nThere are four different patterns provided depending on customer preference.\r\nDifferent patterns have different levels of black applied across the\r\ncourse of the label, which can affect physical behavior such as labels sticking\r\nto ribbon, ribbon wrinkle, or ribbon tears.\r\nPattern two is specifically chosen to prevent any barcodes from being scannable after the void is applied."},
+            new() { Name= "Start Print Signal", ParameterName = "device.applicator.start_print_mode", Default = "level",  Options = "level, pulse", Description = "This setting selects the applicator port START PRINT mode of operation." },
+            new() { Name= "Tear Off", ParameterName = "ezpl.tear_off", Default = "0",  Options = "-120 - 1200" },
+            new() { Name= "Print Mode", ParameterName = "media.printmode", Default = "tear off",  Options = "tear off" },
+            new() { Name= "Applicator", ParameterName = "device.applicator.end_print", Default = "1",  Options = "off, 1" },
+        ];
         public ObservableCollection<string> BVOperationTypes { get; } = new ObservableCollection<string>()
         {
             "Backup/Void Transfer",
@@ -50,15 +42,13 @@ namespace ZPrinterConfig.ViewModels
             "Normal",
         };
 
-        public string BVSelectedOperationType
-        {
-            get { string val = App.Settings.GetValue("BVSelectedOperationType", "Backup/Void Ribbon"); BVSelectedOperationType_Changed(val); return val; }
-            set { App.Settings.SetValue("BVSelectedOperationType", value); BVSelectedOperationType_Changed(value); }
-        }
+        [ObservableProperty] private string _BVSelectedOperationType = App.Settings.GetValue(nameof(BVSelectedOperationType), "Backup/Void Ribbon");
 
         public MainWindowViewModel()
         {
             Printer.SocketStateEvent += Printer_SocketStateEvent;
+
+            OnBVSelectedOperationTypeChanged(BVSelectedOperationType);
         }
 
         [RelayCommand]
@@ -93,7 +83,7 @@ namespace ZPrinterConfig.ViewModels
             });
         }
         [RelayCommand]
-        private void ReadAll(object parameter)
+        private void ReadAll()
         {
             Task.Run(ResetStatus);
 
@@ -125,17 +115,15 @@ namespace ZPrinterConfig.ViewModels
             });
         }
         [RelayCommand]
-        private void CopyRecommended(object parameter)
+        private void CopyRecommended(PrinterParameter parameter)
         {
-            PrinterParameter ps = (PrinterParameter)parameter;
-
-            if (string.IsNullOrEmpty(ps.Recommended))
+            if (string.IsNullOrEmpty(parameter.Recommended))
                 return;
 
-            ps.WriteValue = ps.Recommended;
+            parameter.WriteValue = parameter.Recommended;
         }
         [RelayCommand]
-        private async Task Write(object parameter)
+        private async Task Write(PrinterParameter parameter)
         {
             _ = Task.Run(ResetStatus);
 
@@ -155,11 +143,8 @@ namespace ZPrinterConfig.ViewModels
 
                 if (Printer.Connect(ip, Port))
                 {
-                    PrinterParameter ps = (PrinterParameter)parameter;
-
                     //Printer.Send($"! U1 getvar \"\" \"\"\r\n");
-                    Printer.Send($"! U1 setvar \"{ps.ParameterName}\" \"{ps.WriteValue}\"\r\n ");
-
+                    Printer.Send($"! U1 setvar \"{parameter.ParameterName}\" \"{parameter.WriteValue}\"\r\n ");
                     Read(parameter);
                 }
 
@@ -202,8 +187,10 @@ namespace ZPrinterConfig.ViewModels
             SocketStatus = "";
         }
 
-        private void BVSelectedOperationType_Changed(string value)
+        partial void OnBVSelectedOperationTypeChanged(string value)
         {
+            App.Settings.SetValue("BVSelectedOperationType", value);
+
             if (value == "Backup/Void Transfer")
             {
                 BVSettings.First(s => s.ParameterName == "ezpl.reprint_mode").Recommended = "on";

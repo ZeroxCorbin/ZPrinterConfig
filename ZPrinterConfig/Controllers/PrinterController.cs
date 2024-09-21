@@ -8,8 +8,6 @@ namespace ZPrinterConfig.Controllers
 {
     public class PrinterController
     {
-
-
         private AsyncSocket.ASocketManager Socket { get; }
 
         public SocketStates SocketState { get; set; }
@@ -89,7 +87,7 @@ namespace ZPrinterConfig.Controllers
 
         public List<PrinterParameter> GetAllSettings(string ip, string port)
         {
-            List<PrinterParameter> settings = new List<PrinterParameter>();
+            List<PrinterParameter> settings = new();
 
             if (Connect(ip, port))
             {

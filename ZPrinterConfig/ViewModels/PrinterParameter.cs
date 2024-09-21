@@ -1,13 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ZPrinterConfig.ViewModels
 {
-    public class PrinterParameter : ObservableObject
+    public partial class PrinterParameter : ObservableObject
     {
         public string Name { get; internal set; }
 
@@ -16,14 +11,13 @@ namespace ZPrinterConfig.ViewModels
         public string WriteValue
         {
             get => App.Settings.GetValue(ParameterName, Default);
-            set { App.Settings.SetValue(ParameterName, value); OnPropertyChanged("WriteValue"); }
+            set { App.Settings.SetValue(ParameterName, value); OnPropertyChanged(nameof(WriteValue)); }
         }
-        public string ReadValue { get => _ReadValue; set => SetProperty(ref _ReadValue, value); }
-        private string _ReadValue;
+        [ObservableProperty] private string _ReadValue;
+
         public string Default { get; internal set; }
 
-        public string Recommended { get => _Recommended; set => SetProperty(ref _Recommended, value); }
-        private string _Recommended;
+        [ObservableProperty] private string _Recommended;
 
         public string Options { get; internal set; }
 

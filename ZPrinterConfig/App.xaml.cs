@@ -38,7 +38,7 @@ namespace ZPrinterConfig
                 _ = Directory.CreateDirectory(UserDataDirectory);
             }
 
-            Settings = new Databases.SimpleDatabase().Init(Path.Combine(UserDataDirectory, $"{ApplicationSettingsFile}{ApplicationSettingsExtension}"), false);
+            Settings = new Databases.SimpleDatabase().Open(Path.Combine(UserDataDirectory, $"{ApplicationSettingsFile}{ApplicationSettingsExtension}"));
 
             if (Settings == null)
             {
