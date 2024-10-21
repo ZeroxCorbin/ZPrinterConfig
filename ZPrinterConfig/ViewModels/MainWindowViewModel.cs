@@ -176,10 +176,7 @@ namespace ZPrinterConfig.ViewModels
 
             return ip;
         }
-        private void Printer_SocketStateEvent(SocketStates state, string message)
-        {
-            SocketStatus = message;
-        }
+        private void Printer_SocketStateEvent(SocketStates state, string message) => SocketStatus = message;
 
         private void ResetStatus()
         {
