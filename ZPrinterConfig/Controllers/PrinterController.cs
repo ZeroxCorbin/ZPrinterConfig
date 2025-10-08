@@ -14,20 +14,35 @@ namespace ZPrinterConfig.Controllers
         public delegate void SocketStateEventDelegate(SocketStates state, string message);
         public event SocketStateEventDelegate SocketStateEvent;
 
-        public bool IsConnected => Socket.IsConnected;
+        public bool IsConnected => Socket.State == AsyncSocket.ASocketStates.Open;
 
         public PrinterController()
         {
             Socket = new AsyncSocket.ASocketManager();
-            Socket.CloseEvent += Socket_CloseEvent;
-            Socket.ConnectEvent += Socket_ConnectEvent;
             Socket.ExceptionEvent += Socket_ExceptionEvent;
-            Socket.MessageEvent += Socket_MessageEvent;
+            Socket.PropertyChanged += Socket_PropertyChanged;
+        }
+
+        private void Socket_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+
+            if (e.PropertyName == nameof(AsyncSocket.ASocket.State))
+            {
+                switch (Socket.State)
+                {
+                    case AsyncSocket.ASocketStates.Closed:
+                        Socket_CloseEvent();
+                        break;
+                    case AsyncSocket.ASocketStates.Open:
+                        Socket_ConnectEvent();
+                        break;
+                }
+            }
         }
 
         public void ConnectAsync(string ipAddress, string port)
         {
-            if (!Socket.IsConnected)
+            if (Socket.State != AsyncSocket.ASocketStates.Open)
             {
                 SocketStateEvent?.Invoke(SocketStates.Trying, "Trying");
                 Task.Run(() =>
@@ -40,7 +55,7 @@ namespace ZPrinterConfig.Controllers
 
         public bool Connect(string ipAddress, string port)
         {
-            if (!Socket.IsConnected)
+            if (Socket.State != AsyncSocket.ASocketStates.Open)
             {
                 SocketStateEvent?.Invoke(SocketStates.Trying, "Trying");
 
@@ -77,12 +92,6 @@ namespace ZPrinterConfig.Controllers
         {
             SocketState = SocketStates.Closed;
             SocketStateEvent?.Invoke(SocketStates.Closed, "Close");
-        }
-        private void Socket_MessageEvent(object sender, EventArgs e)
-        {
-            string message = (string)sender;
-
-
         }
 
         public List<PrinterParameter> GetAllSettings(string ip, string port)
