@@ -41,13 +41,13 @@
       <Version>2.4.11</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro.IconPacks.Modern">
-      <Version>6.1.0</Version>
+      <Version>6.2.1</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro.IconPacks.RadixIcons">
-      <Version>6.1.0</Version>
+      <Version>6.2.1</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro.IconPacks.Unicons">
-      <Version>6.1.0</Version>
+      <Version>6.2.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
