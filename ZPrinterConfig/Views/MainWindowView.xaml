@@ -1,125 +1,175 @@
-﻿<mah:MetroWindow x:Class="ZPrinterConfig.Views.MainWindowView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        xmlns:local="clr-namespace:ZPrinterConfig.ViewModels"
-                 xmlns:Convert="clr-namespace:ZPrinterConfig.Converters"
-        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
-        xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
-        Dialog:DialogParticipation.Register="{Binding}"
-        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
-        mc:Ignorable="d"
-        SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" PreviewKeyDown="MetroWindow_PreviewKeyDown">
-    
+﻿<mah:MetroWindow
+    x:Class="ZPrinterConfig.Views.MainWindowView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Convert="clr-namespace:ZPrinterConfig.Converters"
+    xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+    xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
+    xmlns:local="clr-namespace:ZPrinterConfig.ViewModels"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Dialog:DialogParticipation.Register="{Binding}"
+    d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
+    PreviewKeyDown="MetroWindow_PreviewKeyDown"
+    ResizeMode="NoResize"
+    SizeToContent="WidthAndHeight"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
     <mah:MetroWindow.DataContext>
-        <local:MainWindowViewModel/>
+        <local:MainWindowViewModel />
     </mah:MetroWindow.DataContext>
 
     <mah:MetroWindow.Resources>
-        <Convert:RecommendedValueToVisibility x:Key="recommendedValueToVisibility"/>
+        <Convert:RecommendedValueToVisibility x:Key="recommendedValueToVisibility" />
     </mah:MetroWindow.Resources>
 
     <mah:MetroWindow.Title>
         <MultiBinding StringFormat="ZPrinterConfig : {0}">
-            <Binding Path="Version"/>
+            <Binding Path="Version" />
         </MultiBinding>
     </mah:MetroWindow.Title>
 
     <mah:MetroWindow.RightWindowCommands>
-        <mah:WindowCommands>>
-
-            <!--<Button BorderThickness="0" 
+        <mah:WindowCommands>
+            >
+            <!--<Button BorderThickness="0"
                         x:Name="btnColorBlind"
                         Click="btnColorBlind_Click">
                 <IconPacks:PackIconModern Width="20" Height="20" Kind="Eye"/>
             </Button>-->
 
-            <Button BorderThickness="0" 
-                        x:Name="btnLightTheme"
-                        Click="btnLightTheme_Click">
-                <IconPacks:PackIconModern Width="20" Height="20" Kind="WeatherSun"/>
+            <Button
+                x:Name="btnLightTheme"
+                BorderThickness="0"
+                Click="btnLightTheme_Click">
+                <IconPacks:PackIconModern
+                    Width="20"
+                    Height="20"
+                    Kind="WeatherSun" />
             </Button>
 
-            <Button BorderThickness="0" 
-                        x:Name="btnDarkTheme"
-                        Click="btnDarkTheme_Click">
-                <IconPacks:PackIconModern Width="20" Height="20" Kind="MoonWaningCrescent"/>
+            <Button
+                x:Name="btnDarkTheme"
+                BorderThickness="0"
+                Click="btnDarkTheme_Click">
+                <IconPacks:PackIconModern
+                    Width="20"
+                    Height="20"
+                    Kind="MoonWaningCrescent" />
             </Button>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 
 
-    <Grid Margin="5" >
+    <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
-            <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
-                
-                <Label Content="Printer Connection Details" Margin="3"/>
-                
-                <TextBox mah:TextBoxHelper.Watermark="Printer IP / Host" Margin="3"
-                         Text="{Binding Host}" MinWidth="80"/>
-                
-                <TextBox mah:TextBoxHelper.Watermark="Port" Margin="3,3,0,3"
-                         Text="{Binding Port}" MinWidth="80"/>
+        <Border
+            Grid.Row="0"
+            Margin="3"
+            BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+            BorderThickness="1">
+            <StackPanel
+                Margin="3"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
 
-                <Button Grid.Column="1" Margin="0,3" Name="btnResetPortNumber"
-                            ToolTip="Reset port number." Click="btnResetPortNumber_Click">
-                    <IconPacks:PackIconRadixIcons Kind="Reset"/>
+                <Label Margin="3" Content="Printer Connection Details" />
+
+                <TextBox
+                    MinWidth="80"
+                    Margin="3"
+                    mah:TextBoxHelper.Watermark="Printer IP / Host"
+                    Text="{Binding Host}" />
+
+                <TextBox
+                    MinWidth="80"
+                    Margin="3,3,0,3"
+                    mah:TextBoxHelper.Watermark="Port"
+                    Text="{Binding Port}" />
+
+                <Button
+                    Name="btnResetPortNumber"
+                    Grid.Column="1"
+                    Margin="0,3"
+                    Click="btnResetPortNumber_Click"
+                    ToolTip="Reset port number.">
+                    <IconPacks:PackIconRadixIcons Kind="Reset" />
                 </Button>
 
-                <Label Content="{Binding SocketStatus}" Margin="3"/>
+                <Label Margin="3" Content="{Binding SocketStatus}" />
 
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="1" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
-            <StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Left">
-                <Label Content="Select a Label Type: " Margin="3"/>
-                <ComboBox ItemsSource="{Binding BVOperationTypes}" SelectedValue="{Binding BVSelectedOperationType}" MinWidth="100" Margin="3"/>
+        <Border
+            Grid.Row="1"
+            Margin="3"
+            BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+            BorderThickness="1">
+            <StackPanel
+                Margin="3"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <Label Margin="3" Content="Select a Label Type: " />
+                <ComboBox
+                    MinWidth="100"
+                    Margin="3"
+                    ItemsSource="{Binding BVOperationTypes}"
+                    SelectedValue="{Binding BVSelectedOperationType}" />
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" Margin="3">
+        <Border
+            Grid.Row="2"
+            Margin="3"
+            BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+            BorderThickness="1">
 
-            <DataGrid x:Name="dgBVParameters" ItemsSource="{Binding BVSettings}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False"
-                          Margin="3" SelectionChanged="DataGrid_SelectionChanged">
+            <DataGrid
+                x:Name="dgBVParameters"
+                Margin="3"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserSortColumns="False"
+                ItemsSource="{Binding BVSettings}"
+                SelectionChanged="DataGrid_SelectionChanged">
                 <DataGrid.Columns>
 
-                    <DataGridTemplateColumn Header="Parameter Name" >
+                    <DataGridTemplateColumn Header="Parameter Name">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Label Content="{Binding Name, Mode=OneWay}" ToolTip="{Binding Description}"/>
-                                 </StackPanel>
+                                    <Label Content="{Binding Name, Mode=OneWay}" ToolTip="{Binding Description}" />
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
                     <DataGridTemplateColumn Header="Parameter Path">
-                                                <DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <Label ToolTip="{Binding Description}">
-                                        <TextBlock Text="{Binding ParameterName, Mode=OneWay}"/>
+                                        <TextBlock Text="{Binding ParameterName, Mode=OneWay}" />
                                     </Label>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="Options" Binding="{Binding Options, Mode=OneWay}"/>
+                    <DataGridTextColumn Binding="{Binding Options, Mode=OneWay}" Header="Options" />
 
-                    <DataGridTextColumn Header="Default" Binding="{Binding Default, Mode=OneWay}">
+                    <DataGridTextColumn Binding="{Binding Default, Mode=OneWay}" Header="Default">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -128,7 +178,7 @@
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Recommended" Binding="{Binding Recommended, Mode=OneWay}">
+                    <DataGridTextColumn Binding="{Binding Recommended, Mode=OneWay}" Header="Recommended">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="TextBlock.TextAlignment" Value="Right" />
@@ -142,16 +192,21 @@
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition Width="auto"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
 
-                                    <Button Grid.Column="1" Margin="3"
-                                            Visibility="{Binding Path=DataContext.Recommended, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource recommendedValueToVisibility}}"
-                                            Command="{Binding Path=DataContext.CopyRecommendedCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
-                                            CommandParameter="{Binding}">
-                                        <IconPacks:Unicons Kind="AngleDoubleRightThinline" Height="8" Width="8"/>
+                                    <Button
+                                        Grid.Column="1"
+                                        Margin="3"
+                                        Command="{Binding Path=DataContext.CopyRecommendedCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"
+                                        CommandParameter="{Binding}"
+                                        Visibility="{Binding Path=DataContext.Recommended, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource recommendedValueToVisibility}}">
+                                        <IconPacks:Unicons
+                                            Width="8"
+                                            Height="8"
+                                            Kind="AngleDoubleRightThinline" />
                                     </Button>
 
                                 </Grid>
@@ -163,7 +218,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <TextBox Text="{Binding WriteValue}" TextChanged="TextBox_TextChanged"/>
+                                    <TextBox Text="{Binding WriteValue}" TextChanged="TextBox_TextChanged" />
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -174,24 +229,29 @@
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition Width="auto"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
-                                    <Button Grid.Column="1" Command="{Binding Path=DataContext.WriteCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
-                                            CommandParameter="{Binding}"
-                                            Margin="3">
-                                        <IconPacks:Unicons Kind="EditAlt" Height="20" Width="20"/>
+                                    <Button
+                                        Grid.Column="1"
+                                        Margin="3"
+                                        Command="{Binding Path=DataContext.WriteCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"
+                                        CommandParameter="{Binding}">
+                                        <IconPacks:Unicons
+                                            Width="20"
+                                            Height="20"
+                                            Kind="EditAlt" />
                                     </Button>
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <!--The parameter value-->
+                    <!--  The parameter value  -->
                     <DataGridTextColumn Binding="{Binding ReadValue}">
                         <DataGridTextColumn.Header>
-                            <Button Content="Read All" Command="{Binding Path=DataContext.ReadAllCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"/>
+                            <Button Command="{Binding Path=DataContext.ReadAllCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" Content="Read All" />
                         </DataGridTextColumn.Header>
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">
@@ -208,14 +268,14 @@
 
         <StatusBar Grid.Row="4" Margin="3">
             <StatusBarItem>
-                <TextBlock Text="Status: "/>
+                <TextBlock Text="Status: " />
             </StatusBarItem>
-            
+
             <StatusBarItem>
-                <TextBlock Text="{Binding Status}"/>
+                <TextBlock Text="{Binding Status}" />
             </StatusBarItem>
         </StatusBar>
-        
+
     </Grid>
 
 </mah:MetroWindow>
