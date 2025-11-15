@@ -14,8 +14,10 @@ public partial class App : Application
 {
     public static string Version;
 
-    public static string WorkingDir { get; set; } = System.IO.Directory.GetCurrentDirectory();
-    public static string UserDataDirectory => $"{WorkingDir}\\UserData";
+    public static string AppBasePath =>
+        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+        ?? Directory.GetCurrentDirectory();
+    public static string UserDataDirectory => $"{AppBasePath}\\UserData";
     public static string ApplicationSettingsFile => "ApplicationSettings";
     public static string ApplicationSettingsExtension => ".sqlite";
 

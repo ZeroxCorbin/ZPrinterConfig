@@ -151,7 +151,7 @@
                                             Visibility="{Binding Path=DataContext.Recommended, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource recommendedValueToVisibility}}"
                                             Command="{Binding Path=DataContext.CopyRecommendedCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
                                             CommandParameter="{Binding}">
-                                        <IconPacks:Unicons Kind="AngleDoubleRightLine" Height="8" Width="8"/>
+                                        <IconPacks:Unicons Kind="AngleDoubleRightThinline" Height="8" Width="8"/>
                                     </Button>
 
                                 </Grid>
@@ -181,7 +181,7 @@
                                     <Button Grid.Column="1" Command="{Binding Path=DataContext.WriteCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
                                             CommandParameter="{Binding}"
                                             Margin="3">
-                                        <IconPacks:Unicons Kind="EditLine" Height="20" Width="20"/>
+                                        <IconPacks:Unicons Kind="EditAlt" Height="20" Width="20"/>
                                     </Button>
                                 </Grid>
                             </DataTemplate>
