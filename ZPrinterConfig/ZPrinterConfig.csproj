@@ -30,8 +30,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\AsyncSocket\AsyncSocket.csproj" />
-    <ProjectReference Include="..\..\LibDatabases\LibSimpleDatabase\LibSimpleDatabase.csproj" />
     <ProjectReference Include="..\..\Logging.lib\Logging.lib.csproj" />
+    <ProjectReference Include="..\..\SimpleDatabase.lib\SimpleDatabase.lib.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm">
@@ -53,7 +53,6 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
       <Version>1.1.135</Version>
     </PackageReference>
-    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
@@ -76,8 +75,8 @@
     <Compile Remove="Core\ViewModelBase.cs" />
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(SolutionDir)\README.md" "$(TargetDir)\README.md"
-copy /Y "$(SolutionDir)\LICENSE" "$(TargetDir)\LICENSE"
+    <PostBuildEvent>copy /Y "$(SolutionDir)README.md" "$(TargetDir)README.md"
+copy /Y "$(SolutionDir)LICENSE" "$(TargetDir)LICENSE"
 del "$(TargetDir)*.pdb" /q</PostBuildEvent>
 
     <AnalysisLevel>preview</AnalysisLevel>

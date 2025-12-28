@@ -1,5 +1,4 @@
 ﻿using ControlzEx.Theming;
-using LibSimpleDatabase;
 using Logging.lib;
 using System.IO;
 using System.Reflection;
@@ -21,7 +20,7 @@ public partial class App : Application
     public static string ApplicationSettingsFile => "ApplicationSettings";
     public static string ApplicationSettingsExtension => ".sqlite";
 
-    public static SimpleDatabase Settings { get; private set; }
+    public static SimpleDatabase.lib.SettingsService Settings { get; private set; }
 
     public App()
     { 
@@ -35,13 +34,7 @@ public partial class App : Application
             _ = Directory.CreateDirectory(UserDataDirectory);
         }
 
-        Settings = new SimpleDatabase();
-        _ = Settings.Open(Path.Combine(UserDataDirectory, $"{ApplicationSettingsFile}{ApplicationSettingsExtension}"));
-
-        if (Settings == null)
-        {
-            return;
-        }
+        Settings = new SimpleDatabase.lib.SettingsService(Path.Combine(UserDataDirectory, $"{ApplicationSettingsFile}{ApplicationSettingsExtension}"));
     }
 
     protected override void OnStartup(StartupEventArgs e)
